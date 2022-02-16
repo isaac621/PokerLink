@@ -1,1 +1,105 @@
-<mxfile host="app.diagrams.net" modified="2022-02-16T15:55:02.628Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36" version="16.5.6" etag="CscO9s20GH8aREftEROa" type="github"><diagram id="W9-AB1qXHFB3byyazvKI">UzV2zq1wL0osyPDNT0nNUTV2VTV2LsrPL4GwciucU3NyVI0MMlNUjV1UjYwMgFjVyA2HrCFY1qAgsSg1rwSLBiADYTaQg2Y1AA==</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2022-02-16T16:20:19.055Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36" etag="AG878TpPcyNVzy6G21Cn" version="16.5.6" type="github">
+  <diagram id="W9-AB1qXHFB3byyazvKI" name="Page-1">
+    <mxGraphModel dx="1673" dy="829" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-1" value="Game system" style="shape=ellipse;html=1;dashed=0;whitespace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="250" y="190" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-2" value="Login System" style="shape=ellipse;html=1;dashed=0;whitespace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="770" y="160" width="150" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-3" value="Option,&lt;br&gt;Bet" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.91;entryY=0.212;entryDx=0;entryDy=0;startArrow=none;startFill=0;endArrow=classic;endFill=1;exitX=0.152;exitY=0.018;exitDx=0;exitDy=0;entryPerimeter=0;exitPerimeter=0;" edge="1" parent="1" source="Lo9XC9nqUmCAaVn2fyuI-16" target="Lo9XC9nqUmCAaVn2fyuI-1">
+          <mxGeometry x="0.2688" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="510" y="215" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-4" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.997;entryY=0.558;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;endArrow=classic;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="Lo9XC9nqUmCAaVn2fyuI-16" target="Lo9XC9nqUmCAaVn2fyuI-1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="490" y="257" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-5" value="Chat message" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="Lo9XC9nqUmCAaVn2fyuI-4">
+          <mxGeometry x="-0.3096" relative="1" as="geometry">
+            <mxPoint x="-41" y="-3" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-6" value="Options,&lt;br&gt;Bets" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.614;entryY=0.993;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;endArrow=classic;endFill=1;" edge="1" parent="1" source="Lo9XC9nqUmCAaVn2fyuI-7" target="Lo9XC9nqUmCAaVn2fyuI-1">
+          <mxGeometry x="-0.4006" y="15" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="439" y="355" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-7" value="Other registered&lt;br&gt;User" style="html=1;dashed=0;whitespace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="535" y="330" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-8" value="Requests" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.421;entryY=1.022;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;endArrow=classic;endFill=1;" edge="1" parent="1" source="Lo9XC9nqUmCAaVn2fyuI-9" target="Lo9XC9nqUmCAaVn2fyuI-1">
+          <mxGeometry x="-0.6033" y="-5" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="425" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-9" value="Server" style="html=1;dashed=0;whitespace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="535" y="400" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-10" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.067;entryY=0.232;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;endArrow=classic;endFill=1;" edge="1" parent="1" source="Lo9XC9nqUmCAaVn2fyuI-12" target="Lo9XC9nqUmCAaVn2fyuI-2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="765" y="195" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-11" value="Regitration information" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="Lo9XC9nqUmCAaVn2fyuI-10">
+          <mxGeometry x="-0.3315" y="-1" relative="1" as="geometry">
+            <mxPoint x="27" y="-16" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-12" value="Visitor" style="html=1;dashed=0;whitespace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="535" y="170" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-13" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.005;entryY=0.608;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;endArrow=classic;endFill=1;" edge="1" parent="1" source="Lo9XC9nqUmCAaVn2fyuI-16" target="Lo9XC9nqUmCAaVn2fyuI-2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="700" y="251" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-14" value="Account information" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="Lo9XC9nqUmCAaVn2fyuI-13">
+          <mxGeometry x="0.0843" y="1" relative="1" as="geometry">
+            <mxPoint x="-15" y="-9" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-15" value="Poker room information" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=none;startFill=0;endArrow=classic;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="Lo9XC9nqUmCAaVn2fyuI-16" target="Lo9XC9nqUmCAaVn2fyuI-17">
+          <mxGeometry x="0.4329" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="740" y="279" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-16" value="Registered&lt;br&gt;User" style="html=1;dashed=0;whitespace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="535" y="254" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-17" value="Poker Room&lt;br&gt;Management &lt;br&gt;system" style="shape=ellipse;html=1;dashed=0;whitespace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="840" y="350" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-21" value="User ID" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Lo9XC9nqUmCAaVn2fyuI-19" target="Lo9XC9nqUmCAaVn2fyuI-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Lo9XC9nqUmCAaVn2fyuI-19" value="Admin" style="html=1;dashed=0;whitespace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="535" y="100" width="100" height="50" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
