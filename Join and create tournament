@@ -1,1 +1,123 @@
-<mxfile host="app.diagrams.net" modified="2022-02-16T10:58:52.314Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36" version="16.5.6" etag="vF5oRAyLhzmtV-B9TTET" type="github"><diagram id="r-7jDMvR8ghL1oNamPG-">UzV2zq1wL0osyPDNT0nNUTV2VTV2LsrPL4GwciucU3NyVI0MMlNUjV1UjYwMgFjVyA2HrCFY1qAgsSg1rwSLBiADYTaQg2Y1AA==</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2022-02-16T11:16:43.876Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36" etag="7lSF1nZyLPRK8ruI-ZMS" version="16.5.6" type="github">
+  <diagram id="r-7jDMvR8ghL1oNamPG-" name="Page-1">
+    <mxGraphModel dx="1887" dy="889" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="12Ed38av-qWTjWLTa1eo-4" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="12Ed38av-qWTjWLTa1eo-1" target="12Ed38av-qWTjWLTa1eo-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-7" value="Tournament name,&lt;br&gt;Initial chips,&lt;br&gt;Blind level duration&lt;br&gt;Maximum player number" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="12Ed38av-qWTjWLTa1eo-1" target="12Ed38av-qWTjWLTa1eo-6">
+          <mxGeometry x="0.2595" y="39" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-13" value="User ID,&lt;br&gt;Table ID,&lt;br&gt;Password(if needed)" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="12Ed38av-qWTjWLTa1eo-1" target="12Ed38av-qWTjWLTa1eo-12">
+          <mxGeometry x="0.2988" y="32" relative="1" as="geometry">
+            <mxPoint y="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-15" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="12Ed38av-qWTjWLTa1eo-1" target="12Ed38av-qWTjWLTa1eo-14">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="310" y="520" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-16" value="Tournament name,&lt;br&gt;Initial chips,&lt;br&gt;Blind level duration&lt;br&gt;Maximum player number,&lt;br&gt;password,&lt;br&gt;user Id" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="12Ed38av-qWTjWLTa1eo-15">
+          <mxGeometry x="0.4004" y="-1" relative="1" as="geometry">
+            <mxPoint x="29" y="-59" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-24" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="12Ed38av-qWTjWLTa1eo-1" target="12Ed38av-qWTjWLTa1eo-22">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="340" y="630" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-25" value="Password,&lt;br&gt;University,&lt;br&gt;Profile picture" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="12Ed38av-qWTjWLTa1eo-24">
+          <mxGeometry x="0.3628" y="5" relative="1" as="geometry">
+            <mxPoint x="71" y="-25" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-26" value="Password,&lt;br&gt;University,&lt;br&gt;Profile picture" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="12Ed38av-qWTjWLTa1eo-24">
+          <mxGeometry x="0.3628" y="5" relative="1" as="geometry">
+            <mxPoint x="385" y="-25" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-1" value="User Input" style="html=1;dashed=0;whitespace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="60" y="350" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-3" value="logout" style="shape=ellipse;html=1;dashed=0;whitespace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="420" y="100" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-11" value="List of poker tables" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="12Ed38av-qWTjWLTa1eo-6" target="12Ed38av-qWTjWLTa1eo-10">
+          <mxGeometry x="0.4026" y="15" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="610" y="185" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-6" value="Search for &lt;br&gt;poker table" style="shape=ellipse;html=1;dashed=0;whitespace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="490" y="230" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-9" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="12Ed38av-qWTjWLTa1eo-8" target="12Ed38av-qWTjWLTa1eo-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-8" value="Poker table database" style="html=1;dashed=0;whitespace=wrap;shape=partialRectangle;right=0;left=0;" vertex="1" parent="1">
+          <mxGeometry x="880" y="280" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-10" value="Search results&amp;nbsp;&lt;br&gt;display" style="html=1;dashed=0;whitespace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="720" y="160" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-28" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="12Ed38av-qWTjWLTa1eo-12" target="12Ed38av-qWTjWLTa1eo-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-29" value="User ID" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="12Ed38av-qWTjWLTa1eo-12" target="12Ed38av-qWTjWLTa1eo-8">
+          <mxGeometry x="-0.103" y="12" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-12" value="Join a &lt;br&gt;poker table" style="shape=ellipse;html=1;dashed=0;whitespace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="480" y="353" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-17" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="12Ed38av-qWTjWLTa1eo-14" target="12Ed38av-qWTjWLTa1eo-8">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="670" y="390" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-19" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="12Ed38av-qWTjWLTa1eo-14" target="12Ed38av-qWTjWLTa1eo-20">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="640" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-14" value="Create a&amp;nbsp;&lt;br&gt;poker table" style="shape=ellipse;html=1;dashed=0;whitespace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="480" y="470" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-18" value="User table database" style="html=1;dashed=0;whitespace=wrap;shape=partialRectangle;right=0;left=0;" vertex="1" parent="1">
+          <mxGeometry x="830" y="495" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-21" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="12Ed38av-qWTjWLTa1eo-20" target="12Ed38av-qWTjWLTa1eo-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-20" value="Mark user&lt;br&gt;as gaming" style="shape=ellipse;html=1;dashed=0;whitespace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="650" y="470" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-23" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="12Ed38av-qWTjWLTa1eo-22" target="12Ed38av-qWTjWLTa1eo-18">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="830" y="630" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12Ed38av-qWTjWLTa1eo-22" value="Edit user &lt;br&gt;profile" style="shape=ellipse;html=1;dashed=0;whitespace=wrap;aspect=fixed;perimeter=ellipsePerimeter;" vertex="1" parent="1">
+          <mxGeometry x="480" y="590" width="80" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
