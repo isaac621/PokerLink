@@ -460,6 +460,10 @@ function cardsCompare(cards1, cards2){
     }
 }
 
+/************************
+ * code for testing!
+ ******************************/
+
 const communityCards = [
     generateCard(suits.club, 2),
     generateCard(suits.diamond, 2),
