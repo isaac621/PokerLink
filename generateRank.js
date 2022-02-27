@@ -1,3 +1,15 @@
+
+
+///utility
+function swap(arr, index1, index2){
+    return arr.map((e,i)=>{
+        if(i === index1) return arr[index2];
+        if(i === index2) return arr[index1];
+        return e
+    })
+}
+////
+
 const suits = {
     spade: 0,
     heart: 1,
@@ -41,21 +53,13 @@ function generateCard(suit, number)
 }
 
 
-///utility
-function swap(arr, index1, index2){
-    return arr.map((e,i)=>{
-        if(i === index1) return arr[index2];
-        if(i === index2) return arr[index1];
-        return e
-    })
-}
-////
+
 
 const cardsSort = (cards) =>
 {
 
     //sorting the cards from their number
-    cards_inNumber = cards.reduce((prev1, e1, i1)=>{
+    const cards_inNumber = cards.reduce((prev1, e1, i1)=>{
         //find the index of card to be swapped
         
         let target = prev1.reduce((prev2, e2, i2)=>{
@@ -75,7 +79,7 @@ const cardsSort = (cards) =>
     }, cards)
     
     //sorting the cards from their suits
-    cards_inSuit = cards_inNumber.reduce((prev1, e1, i1)=>{
+    const cards_inSuit = cards_inNumber.reduce((prev1, e1, i1)=>{
         //find the index of card to be swapped
         let target = prev1.reduce((prev2, e2, i2)=>{
             if(i2 < i1) return prev2;
