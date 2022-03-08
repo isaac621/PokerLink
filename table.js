@@ -124,12 +124,14 @@ const table = {
                 continue;
             }
             let playerAction = prompt(`${this.players[this.playerInAction].name} Option \n
+            *Your chips: ${this.players[this.playerInAction].chips} \n
             *existingBet: ${this.existingBet}\n
             *name: ${this.players[0].name} ${this.players[1].name} ${this.players[2].name} ${this.players[3].name} ${this.players[4].name}\n
             *status:: waiting: 0, acted: 1, fold: 2, allin: 3
             *status: ${this.players[0].status} ${this.players[1].status} ${this.players[2].status} ${this.players[3].status} ${this.players[4].status}\n
             *bet: ${this.players[0].bet} ${this.players[1].bet} ${this.players[2].bet} ${this.players[3].bet} ${this.players[4].bet}\n
-            *options:: 0: check , 1: call, 2: raise, 3: fold, 4: exit`);
+            *options:: ${this.existingBet==this.players[this.playerInAction].bet ? '0: check, 2: raise, 3: fold, 4: exit' : 
+                '1: call, 2: raise, 3: fold, 4: exit'}`);
             /*
             0: check
             1: call
