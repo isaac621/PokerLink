@@ -22,4 +22,10 @@ function generateRoomID(length){
     return roomID.join('')
 }
 
-export {swap, generateRoomID}
+function sleep(duration){
+    return new Promise((resolve)=>{
+        setTimeout(resolve, duration)
+    })
+}
+
+export {swap, generateRoomID, sleep}

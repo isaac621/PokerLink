@@ -3,7 +3,9 @@ const PlayerStatus = {
     acted: 1,
     allin: 2,
     fold: 3,
-    out: 4,
+    win: 4,
+    out: 5,
+   
 }
 
 const Suits = {

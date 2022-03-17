@@ -8,7 +8,7 @@ function generatePlayer(name, chip = 200, socketID, isHost=false){
         chips: chip,
         bet: 0,
         status: PlayerStatus.waiting,
-        pool: 0,
+        pot: 0,
         holeCards: [],
         socketID: socketID,
         isHost: isHost,
@@ -39,6 +39,7 @@ function generateGame(id, maxNumOfPlayers=4, initialChips=200, minimumBet=2){
     initialChips: 200,
     minimumBet: 2,
     sbPosition: -1,
+    bbPosition: 0,
     existingBet: 0,
     minimumRaise: 0,
 
@@ -57,7 +58,6 @@ function generateGame(id, maxNumOfPlayers=4, initialChips=200, minimumBet=2){
         this.players.splice(this.players.findIndex(player=>player.socketID == socketID),1);
     },
 
-    
     setWinner: function(index){
         if(index < 0 || index >= this.players.length){
             console.log('Please enter the value within the valid range')
@@ -65,19 +65,66 @@ function generateGame(id, maxNumOfPlayers=4, initialChips=200, minimumBet=2){
         this.winner = index
     },
 
+    eliminatePlayers: function(){
+        //eliminate the players with no chips left
+        this.players = this.players.map((player, index)=>{
+            if(player.chips == 0){
+                player.status = PlayerStatus.out
+                
+            }
+            return player;
+        })
+    },
+
+    getNextPlayer: function(currentPlayerIndex){
+        let nextPlayerIndex= currentPlayerIndex + 1 >= this.players.length ? currentPlayerIndex + 1 - this.players.length : currentPlayerIndex + 1;
+        //move the small blind to the next player if the current small blind player is out
+        while(this.players[nextPlayerIndex].status == PlayerStatus.out){
+            nextPlayerIndex = nextPlayerIndex + 1 >= this.players.length ? nextPlayerIndex + 1 - this.players.length : nextPlayerIndex + 1;
+        }
+
+        return nextPlayerIndex;
+    },
+
+    getPreviousPlayer: function(currentPlayerIndex){
+        let previousPlayerIndex= currentPlayerIndex - 1 < 0 ? currentPlayerIndex - 1 + this.players.length : currentPlayerIndex - 1;
+        //move the small blind to the next player if the current small blind player is out
+        while(this.players[previousPlayerIndex].status == PlayerStatus.out){
+            previousPlayerIndex= previousPlayerIndex - 1 < 0 ? previousPlayerIndex - 1 + this.players.length : previousPlayerIndex - 1;
+        }
+
+        return previousPlayerIndex;
+    },
+
+    getPlayersNotOut: function(){
+        return this.players.filter((player)=>{
+            return player.status != PlayerStatus.out
+        })
+    },
+
+    getNumOfStagesToShowHand: function(){
+        return 5 - this.stage
+    },
+
+    getStage: function(){
+        return this.stage;
+    },
+
     nextStage: function(){
+
+
         this.stage++;
-        if(this.stage>4){
-            this.stage -= 6;
+        if(this.stage>5){
+            this.stage -= 7;
         }
 
         this.playerInAction = this.sbPosition;
         //reset the status of all player who still in the game
         this.players = this.players.map((player)=>{
-            if(player.status != PlayerStatus.fold && player.status != PlayerStatus.allin){
-                player.status = PlayerStatus.waiting;
-                player.bet = 0;
+            if(player.status != PlayerStatus.fold && player.status != PlayerStatus.allin && player.status != PlayerStatus.out){
+                player.status = PlayerStatus.waiting;     
             }
+            player.bet = 0;
             return player
         })
 
@@ -99,18 +146,20 @@ function generateGame(id, maxNumOfPlayers=4, initialChips=200, minimumBet=2){
             case 0:
                 //reset players' state
                 this.players = this.players.map((player)=>{
-                    player.status = PlayerStatus.waiting;
+                    if(player.status != PlayerStatus.out){
+                        player.status = PlayerStatus.waiting;
+                    }
                     player.bet = 0;
-                    player.pool = 0;
+                    player.pot = 0;
                     player.holeCards = []
                     return player;
                 });
 
                 //reset the pot
                 this.pot = [];
-
-                //move the sbPosition to the next person
-                this.sbPosition = this.sbPosition + 1 >= this.players.length ? this.sbPosition + 1 - this.players.length : this.sbPosition + 1;
+                //reset the communityCards
+                this.communityCards = []
+                this.minimumRaise = 0
                 
                 this.currentPot = 0;
 
@@ -121,49 +170,74 @@ function generateGame(id, maxNumOfPlayers=4, initialChips=200, minimumBet=2){
 
             //preflop
             case 1:
-                //deal the hole cards to each player
-                const holeCards = poker.preflop(this.deck, this.players.length)
-                for(let i = 0,  currPlayer; i < this.players.length; i++){
-                    currPlayer = i + this.sbPosition >= this.players.length ? i + this.sbPosition - this.players.length : i + this.sbPosition;
-                    console.log(holeCards)
-                    this.players[currPlayer].holeCards.push(...holeCards[i])
-                }
-
                 //preflop bet condition
                 this.existingBet = this.minimumBet
-                this.players[this.sbPosition].bet = this.minimumBet*0.5;
-                this.players[this.sbPosition].chips -= this.minimumBet*0.5;
-    
-                const bbPosition = this.sbPosition + 1 >= this.players.length ? this.sbPosition + 1 - this.players.length :  this.sbPosition + 1;
-                this.players[bbPosition].bet = this.minimumBet;
-                this.players[bbPosition].chips -= this.minimumBet;
+
+                if( this.sbPosition != this.bbPosition){
+                    this.sbPosition = this.getNextPlayer(this.sbPosition)
+                    this.bbPosition = this.getNextPlayer(this.bbPosition)
+                }
+                else{
+                    this.bbPosition = this.getNextPlayer(this.bbPosition)
+                }
+               
+
+                //small blind operation
+                if( this.sbPosition != this.bbPosition){
+                    this.players[this.sbPosition].bet = this.minimumBet*0.5;
+                    this.players[this.sbPosition].chips -= this.minimumBet*0.5;
+                }
+
+                //big blind operation
+                this.players[this.bbPosition].bet = this.minimumBet;
+                this.players[this.bbPosition].chips -= this.minimumBet;
                 
-                const utgPosition = bbPosition + 1 >= this.players.length ? bbPosition + 1 - this.players.length :  bbPosition + 1;
+                //get utg position
+                const utgPosition = this.getNextPlayer(this.bbPosition)
                 this.playerInAction = utgPosition;
     
                 this.minimumRaise = this.minimumBet
 
+               
+
+                //deal the hole cards to each player
+                const holeCards = poker.preflop(this.deck, this.getPlayersNotOut().length)
+                for(let i = 0,  currPlayer = this.sbPosition; i < this.getPlayersNotOut().length; i++){
+                    
+                    this.players[currPlayer].holeCards.push(...holeCards[i])
+
+                    currPlayer = this.getNextPlayer(currPlayer);
+                }
+
                 break;
             //flop
             case 2:
-                this.communityCards.push(poker.flop(this.deck));
+
+                
+                this.communityCards.push(...poker.flop(this.deck));
                 break;
             //turn:
             case 3:
-                this.communityCards.push(poker.turnOrRiver(this.deck));
+
+                
+                this.communityCards.push(...poker.turnOrRiver(this.deck));
                 break;
             //river:
             case 4:
-                this.communityCards.push(poker.turnOrRiver(this.deck));
+
+
+                this.communityCards.push(...poker.turnOrRiver(this.deck));
                 break;
             //showHand:
             case 5: 
+
                 const hands = this.players.reduce((prev, player, i)=> {
+                
                     if(player.status < 3){
-                        return{
+                        return [...prev, {
                             playerIndex: i,
                             handValue: poker.generateRank([...player.holeCards, ...this.communityCards])
-                        }
+                        }]
                     }else{
                         return prev
                     }
@@ -171,17 +245,18 @@ function generateGame(id, maxNumOfPlayers=4, initialChips=200, minimumBet=2){
 
                 let firstWinners = true;
                 //find the best hand first
+                
                 while(this.pot.find(e=>e>0)){ 
                     const bestHand = hands.reduce((prev, hand)=>{
-                        if(hand.rank > prev.rank){
+                        if(hand.handValue.rank > prev.handValue.rank){
                             return hand
                         }
-                        else if(hand.rank == prev.rank){
+                        else if(hand.handValue.rank == prev.handValue.rank){
                             for(let i=0; i<5; i++){
-                                if(hand.best5[i].number>prev.best5[i].number){
+                                if(hand.handValue.best5[i].number>prev.handValue.best5[i].number){
                                     return hand
                                 }
-                                else if(hand.best5[i].number<prev.best5[i].number){
+                                else if(hand.handValue.best5[i].number<prev.handValue.best5[i].number){
                                     break;
                                 }
                             }
@@ -194,19 +269,19 @@ function generateGame(id, maxNumOfPlayers=4, initialChips=200, minimumBet=2){
                     }, hands[0])
 
                     const winners = hands.reduce((prev, hand)=>{
-                        if(hand.rank == bestHand.rank){
+                        if(hand.handValue.rank == bestHand.handValue.rank){
                             for(let i=0; i<5; i++){
-                                if(hand.best5[i].number<prev.best5[i].number){
+                                if(hand.handValue.best5[i].number < bestHand.handValue.best5[i].number){
                                     return prev;
                                 }
                             }
-
+                        
                             return [...prev, hand]
                         }
+                        return prev
                     }, [])
 
-                    winners = swap(winners, 0, 
-                        winners.reduce((prev,winner,i)=>{
+                    let winnerIndexClosestToDealer = winners.reduce((prev,winner,i)=>{
                         const seat = winner.playerIndex < this.sbPosition ? winner.playerIndex + this.players.length : winner.playerIndex;
                         if(seat < prev.seat){
                             return {
@@ -214,12 +289,17 @@ function generateGame(id, maxNumOfPlayers=4, initialChips=200, minimumBet=2){
                                 seat: seat
                             }
                         }
-                    }, {index: 0, seat: winners[0].playerIndex < this.sbPosition ? winners[0].playerIndex + this.players.length : winners[0].   playerIndex}).index)
+                        return prev;
+                    }, {index: 0, seat: winners[0].playerIndex < this.sbPosition ? winners[0].playerIndex + this.players.length : winners[0].playerIndex})
 
-                    this.potReallocation(winners);
+                    const finalWinners = swap(winners, 0, winnerIndexClosestToDealer.index)
+
+                    
+
+                    this.potReallocation(finalWinners);
 
                     if(firstWinners){
-                        this.winner = winners
+                        this.winner = finalWinners
                     }
                 }
 
@@ -233,16 +313,32 @@ function generateGame(id, maxNumOfPlayers=4, initialChips=200, minimumBet=2){
         this.stage = -1;
     },
 
-    nextPlayer: function(number=1){
-        this.playerInAction+=number;
-        if(this.playerInAction >= this.players.length){
-            this.playerInAction -= this.players.length
-        }
+    noPlayersCall: function(){
+
+       
+        const winner = this.players.reduce((prev, player, i)=>{
+            if(player.status==PlayerStatus.acted || player.status==PlayerStatus.waiting || player.status == PlayerStatus.allin){
+                return [{
+                    playerIndex: i,
+                }]
+            }
+            return prev
+        }, [])
+
+        
+        this.winner = winner
+        this.potReallocation(winner)
+        
+        
+        this.resetStage()
+    },
+
+    nextPlayer: function(){
+        this.playerInAction = this.getNextPlayer(this.playerInAction)
     },
 
     potCalculation: function(){
         let {currentPot, pot} = potSplitting(this.players, this.currentPot)
-
         this.currentPot = currentPot;
         this.pot = this.pot.map((e,i)=>{
             return e + pot[i]
@@ -251,19 +347,18 @@ function generateGame(id, maxNumOfPlayers=4, initialChips=200, minimumBet=2){
 
     potReallocation: function(winners){
         let totalChips = 0;
-        for(let i=this.players[winners[0].playerIndex].pool; i>= 0; i--){
+        for(let i=this.players[winners[0].playerIndex].pot; i>= 0; i--){
             totalChips += this.pot[i];
             this.pot[i] = 0;
         }
-
+        
         winners.map((winner, i)=>{
             if(i == 0){
                 this.players[winner.playerIndex].chips += totalChips % winners.length
             }
             this.players[winner.playerIndex].chips += Math.floor(totalChips / winners.length)
-            this.players[winner.playerIndex].status = PlayerStatus.fold
+            this.players[winner.playerIndex].status = PlayerStatus.win
         })
-        
     },
 
     sendRoomInfo: function(){
@@ -289,7 +384,7 @@ function potSplitting(players, currentPot = 0){
     
     //sort the players accroding their size of bet in this round
     let playersInBet = players.reduce((prev1, e1, i1)=>{
-        //find the index of card to be swapped
+        
         let target = prev1.reduce((prev2, e2, i2)=>{
             if(i2 < i1) return prev2;
             if(e2.bet < prev2.player.bet){
@@ -306,8 +401,6 @@ function potSplitting(players, currentPot = 0){
         return swap(prev1, i1, target);
     }, [...players])
 
-    console.log(JSON.parse(JSON.stringify(playersInBet)))
-    
     
 
     //main operation
@@ -318,17 +411,17 @@ function potSplitting(players, currentPot = 0){
         }
         let currentBet = playersInBet[i].bet;
         //update the player in bet
-        newPlayersInBet = playersInBet.map((player)=>{
+        const newPlayersInBet = playersInBet.map((player)=>{
 
             
             
             if(player.bet >= currentBet){
                 //player who fold his hand could not win the pot
                 if(player.status == PlayerStatus.fold){
-                    player.pool = -1;
+                    player.pot = -1;
                 }
                 else{
-                    player.pool = currentPot;
+                    player.pot = currentPot;
                 }
 
                 player.bet -= currentBet;
@@ -341,7 +434,7 @@ function potSplitting(players, currentPot = 0){
         })
         
         if(playersInBet[i].status == PlayerStatus.allin){
-            // split the pool
+            // split the pot
             currentPot ++
         }
 

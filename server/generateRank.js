@@ -66,9 +66,7 @@ const cardsSort = (cards) =>
     }, cards_inNumber)
     
         
-    
-    
-    cardsShow(cards_inSuit);
+
     return cards_inSuit;
 }
 
@@ -433,7 +431,7 @@ function cardsCompare(cards1, cards2){
 }
 
 function generateRank(cards){
-    HandValueGenerate(cardsSort(cards))
+    return HandValueGenerate(cardsSort(cards))
 }
 
 export {cardsCompare, generateRank}
@@ -449,7 +447,7 @@ function cardsShow(cards){
     
    
     console.log( cards.reduce((prev,e,i)=>{
-        return [...prev, Object.keys(suits).find(key=>(cards[i].suit == Suits[key])) + cards[i].number.toString()]
+        return [...prev, Object.keys(Suits).find(key=>(cards[i].suit == Suits[key])) + cards[i].number.toString()]
     },[]).join(" "))
 }
 
