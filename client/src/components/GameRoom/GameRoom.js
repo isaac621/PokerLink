@@ -1,4 +1,5 @@
-import { Box, Container, Button, Slider } from '@mui/material';
+import { Box, Container, Button, Slider, Fab } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { StatusBar } from './StatusBar';
 import { TableCenter } from './TableCenter';
 import { ChatBox } from './ChatBox';
@@ -45,6 +46,9 @@ export const GameRoom = () =>{
                 <Box sx={Style.gameInfoContainer}>
                     <GameInfo gameID="365437J" gameName="ABC Poker" sb={5}/>
                 </Box>
+                <Fab color="secondary" aria-label="add" sx={Style.backBtn}>
+                    <ArrowBackIcon />
+                </Fab>
             </div>
         
     )
@@ -142,6 +146,12 @@ const Style = {
         top: 20,
         m: 0,
         zIndex: 100,
+    },
+
+    backBtn: {
+        position: 'absolute',
+        right: 40,
+        top: 40
     }
     
 

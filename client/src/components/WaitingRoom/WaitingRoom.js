@@ -45,12 +45,13 @@ export const WaitingRoom = () =>{
                     )
                 })}
                 </List>
+                <Fab color="secondary" aria-label="add" sx={Style.backBtn}>
+                    <ArrowBackIcon />
+                </Fab>
                 <Button sx={Style.startBtn} variant='contained' size="large">
                     Start
                 </Button>
-                <Fab color="secondary" aria-label="add">
-                    <ArrowBackIcon />
-                </Fab>
+               
         </Box>
     )
 }
@@ -58,7 +59,7 @@ export const WaitingRoom = () =>{
 
 const Style = {
     container: {
-        backgroundColor: 'grey.400',
+        backgroundColor: 'white',
         height: '100vh',
         width: '100vw',
         display: 'flex',
@@ -70,14 +71,14 @@ const Style = {
         width: '100%', 
         minheight: 350, 
         maxWidth: 600, 
-        bgcolor: 'background.paper',
+        backgroundColor: 'grey.200',
         overflow: 'scrollY'
     },
     listItem: {
         py: 0
     },
     roomIdContainer: {
-        backgroundColor: 'white',
+        backgroundColor: 'grey.200',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -89,6 +90,11 @@ const Style = {
     },
     startBtn: {
         my: 2
+    },
+    backBtn: {
+        position: 'absolute',
+        right: 40,
+        top: 40
     }
 }
 

@@ -1,5 +1,6 @@
 import { GameRoom } from './components/GameRoom/GameRoom';
 import { WaitingRoom } from './components/WaitingRoom/WaitingRoom';
+import { Lobby } from './components/Lobby/Lobby';
 
 
 
@@ -7,7 +8,8 @@ import { WaitingRoom } from './components/WaitingRoom/WaitingRoom';
 function App() {
   return (
       //<GameRoom/>
-      <WaitingRoom/>
+      //<WaitingRoom/>
+      <Lobby/>
   );
 }
 
