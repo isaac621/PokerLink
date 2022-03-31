@@ -1,0 +1,28 @@
+POST http://localhost:3001/validation/email
+content-type: application/json
+
+{
+    "email" : "1234@gmail.com"
+}
+###
+GET http://localhost:3001/auth/forgot/12332
+content-type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNDQyYTg3MGRjOWI2NzhhNmQ0lZjQxMiIsImlhdCI6MTY0ODY0NDA2MX0.YKzVB5WMPJLTuFaxdNnlhRBkvXRLbzNFdvyEHHR18AU
+
+{
+    "userName" : "Domic",
+    "password" : "123321",
+    "email" : "123@gmail.com"
+}
+
+###
+
+POST http://localhost:3001/login
+content-type: application/json
+
+
+{
+    "userName" : "Domic",
+    "password" : "123321",
+    "email" : "123@gmail.com"
+}
