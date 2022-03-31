@@ -5,50 +5,162 @@ import { TableCenter } from './TableCenter';
 import { ChatBox } from './ChatBox';
 import { GameInfo } from './GameInfo';
 import { gameRoomBg } from '../../assets/img/background';
+import { useSocket } from '../ContextProvider/SocketContextProvider';
+import { useGameContext } from '../ContextProvider/GameContextProvider';
+import { OptionBtns } from './OptionBtns';
+import { useEffect, useState } from 'react';
+import { PlayerStatus } from '../../assets/utils/enumeration';
+import { useNavigate } from "react-router-dom";
 
-const players = [0, 1, 2, 3, 4, 5, 6, 7];
-const cards = [{cardIndex: 'S14'}, {cardIndex: 'H14'}, {cardIndex: 'D10'}, {cardIndex: 'S12'}, {cardIndex: 'C10'}]
+import { EndingScreen } from './EndingScreen';
+
 
 export const GameRoom = () =>{
+    const {socket} = useSocket();
+    const {
+        roomID,
+        setCommunityCards,
+        players, setPlayers,
+        setMinimumRaise,
+        playerInAction, setPlayerInAction,
+        setExistingBet,
+        setPots,
+        dealerPos, setDealerPos,
+        sb, setSb,
+        setOptions,
+        resetGameContext
+    } = useGameContext();
+    const navigate = useNavigate();
+
+    const [gameEnd, setGameEnd] =useState(false);
+    const [winner, setWinner] = useState('');
+
+    useEffect(()=>{
+        socket.on('updateDealer', (dealerPos)=>setDealerPos(dealerPos))
+        socket.on('updatePlayerHoleCards', handleUpdatePlayerHoleCards);
+        socket.on('updatePlayersInfo', handleUpdatePlayersInfo)
+        socket.on('updateCommunityCards', handleUpdateCommunityCards)
+        socket.on('requestOption', handleRequestOption)
+        socket.on('optionReceived', handleOptionReceived)
+        socket.on('updatePot', handleUpdatePot)
+        socket.on('updateSb', (sb)=>setSb(sb))
+
+        socket.on('gameEnd', handleGameEnd)
+
+    }, [])
+
+    function handleGameEnd(name){
+        setWinner(name);
+        setGameEnd(true);
+    }
+
+    function handleUpdatePlayerHoleCards(updateData){
+        updateData = JSON.parse(updateData)
+        setPlayers((prev)=>{
+            return prev.map((player, index)=>{
+
+                if(index == updateData.playerIndex){
+                    return{
+                        ...player, holeCards: updateData.holeCards
+                    }
+                }
+                else{
+                    return player
+                }
+        })})
+    }
+
+    function handleUpdatePlayersInfo(newPlayersData){
+        newPlayersData = JSON.parse(newPlayersData)
+        setPlayers((prev)=>{
+            return prev.map((player, index)=>{
+                return{
+                    ...player, ...newPlayersData[index]
+                }
+        })})
+    }
+
+    function handleUpdateCommunityCards(communityCards){
+        communityCards = JSON.parse(communityCards);
+        setCommunityCards(communityCards)
+    }
+
+    function handleUpdatePot(pot){
+        setPots(pot);
+    }
+
+
+    const client = players.find((player)=>player.socketID == socket.id)
+
+    function handleRequestOption(socketID, playerOptions, minimumRaise, playerInAction, existingBet){
+        setMinimumRaise(minimumRaise);
+        setPlayerInAction(playerInAction);
+        setExistingBet(existingBet);
+        if(socketID == socket.id){
+            setOptions(playerOptions);
+        }
+    }
+
+    function handleOptionReceived(){
+        setOptions({
+            check: false,
+            raise: false,
+            fold: false,
+            call: false
+        })
+    }
+
+    function handleOnClickLeave(){
+        resetGameContext();
+        navigate('/lobby', {replace: true});
+    }
+
+
     return(
             <div style={Style.container}>
+                {
+                    !gameEnd &&
                 <Box>
                     <Box sx={Style.table}>
 
                     </Box>
                 </Box>
-                <Container sx={Style.mainTable}>
+                }
+                {
+                    gameEnd?
+                    <EndingScreen winner={winner}/>:
+
+                    <Container sx={Style.mainTable}>
 
                     {players.map((player, index)=>{
                         return(
                             <Box key={index} sx={{gridArea: `p${index}`,...Style.statusBarContainer}}>
-                                <StatusBar/>
+                                <StatusBar player={player} pos={index} dealer={dealerPos == index} inAction={playerInAction==index}/>
                             </Box>
                         )
                     })}
-                        <TableCenter communityCards={cards}/>
+                        <TableCenter/>
                 </Container>
+
+                }
+                
+                
+                
                 <Box sx={Style.buttonsContainer}>
-                    <Box sx={Style.raiseSliderContainer}>
-                        <Slider sx={Style.raiseSlider} defaultValue={0} aria-label="Default"  valueLabelDisplay="on"/>
-                    </Box>
-                    <Box>
-                        <Button variant="contained" color="secondary" sx={Style.button} size="large">Fold</Button>
-                        <Button variant="contained" color="secondary" sx={Style.button} size="large">Check</Button>
-                        <Button variant="contained" color="secondary" sx={Style.button} size="large">Raise</Button>
-                        <Button variant="contained" color="secondary" sx={Style.button} size="large">Call</Button>
-                    </Box>
-                    
+                    <OptionBtns client={client}/>
                 </Box>
                 <Box sx={Style.chatBoxContainer}>
                     <ChatBox/>
                 </Box>
                 <Box sx={Style.gameInfoContainer}>
-                    <GameInfo gameID="365437J" gameName="ABC Poker" sb={5}/>
+                    <GameInfo/>
                 </Box>
-                <Fab color="secondary" aria-label="add" sx={Style.backBtn}>
+                {
+                    (gameEnd ||client.status == PlayerStatus.out )&&
+                <Fab color="secondary" aria-label="add" sx={Style.backBtn} onClick={handleOnClickLeave}>
                     <ArrowBackIcon />
                 </Fab>
+                }
             </div>
         
     )
@@ -76,7 +188,7 @@ const Style = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundImage: `url(${gameRoomBg})`,
+        //backgroundImage: `url(${gameRoomBg})`,
         backgroundSize: 'cover',
         
         zIndex: 0
@@ -84,12 +196,12 @@ const Style = {
     mainTable: {
         position: 'relative',
         width: '100%',
-        mb: 5,
+        marginBottom: '20px',
         zIndex: 2,
         height: 'auto',
         display: 'grid',
         gridTemplateColumns: 'repeat(5, 150)',
-        gridTemplateRows: 'repeat(3, 50px)',
+        gridTemplateRows: 'repeat(3, 80px)',
         columnGap: 5,
         rowGap: 20,
         gridTemplateAreas: 
@@ -103,7 +215,8 @@ const Style = {
     statusBarContainer: {
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        transform: 'translateY(-35px)'
     },
 
     buttonsContainer: {
@@ -114,23 +227,7 @@ const Style = {
         zIndex: 100
     },
 
-    button: {
-        mx: 1,
-    },
-    
-    raiseSliderContainer: {
-        height: 50,
-        my: 2,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%'
-    },
 
-    raiseSlider: {
-        width: '80%',
-        
-    },
 
     chatBoxContainer: {
         position: 'absolute',

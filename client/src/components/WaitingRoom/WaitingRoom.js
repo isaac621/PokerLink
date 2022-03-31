@@ -1,43 +1,78 @@
-import { Box, List, ListItem, Divider, ListItemText, ListItemAvatar, Avatar, Typography, Button, Fab} from '@mui/material';
+import { Box, List, ListItem, Divider, ListItemText, ListItemAvatar, ListItemIcon,Avatar, Typography, Button, Fab} from '@mui/material';
 import profilePic from '../../assets/img/profilePic.png'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useGameContext } from "../ContextProvider/GameContextProvider";
+import { useSocket } from "../ContextProvider/SocketContextProvider";
 import React from 'react';
+import { useNavigate } from "react-router-dom";
+import StarRateIcon from '@mui/icons-material/StarRate';
 
-const dummy = [{name: "Isaac"}, {name: "Kit"}, {name: "Jomy"}, {name: "Hinson"}, {name: "John"}, {name: "John"}, {name: "John"}, {name: "John"}]
 
 export const WaitingRoom = () =>{
+    const navigate = useNavigate();
+    const {socket} = useSocket();
+    const {players, setPlayers, roomID, setRoomID, roomName} = useGameContext();
+
+
+    socket.on('gameStart', handleGameStart)
+
+    function handleGameStart(players){
+        setPlayers(players);
+        navigate('/gameRoom')
+    }
+
+    function handleOnClickStart(){
+        socket.emit("gameStart", roomID)
+    }
+
+    function handleLeave(){
+        socket.emit('leaveRoom', roomID, ()=>{
+            setRoomID('');
+            navigate('/lobby', {replace: true})
+        });
+    }
+    
     return(
         <Box sx={Style.container}>
             <Box sx={Style.roomIdContainer}>
                 <Typography variant="h4">
-                    Room ID: Jadfa1232131
+                    Room ID: {roomID}
+                </Typography>
+                <Typography variant="h6">
+                    Room Name: {roomName}
                 </Typography>
             </Box>
             <List sx={Style.listContainer}>
-                {dummy.map((player, i, arr)=>{
+                {players.map((player, i, arr)=>{
                     return(
                         <React.Fragment key={i}>
 
-                            <ListItem sx={Style.listItem} alignItems="flex-start">
+                            <ListItem 
+                                sx={{...Style.listItem, 
+                                    bgcolor: player.socketID == socket.id ? 'primary.light' : ''}} 
+                                alignItems="flex-start"
+                            >
                                     <ListItemAvatar>
                                         <Avatar alt="Remy Sharp" src={profilePic} />
                                     </ListItemAvatar>
                                     <ListItemText
                                     primary={player.name}
                                     secondary={
-                                        <>
                                         <Typography
                                             sx={{ display: 'inline' }}
                                             component="span"
                                             variant="body2"
                                             color="text.primary"
                                         >
-                                            Ali Connors
+                                            {player.socketID}
                                         </Typography>
-                                        {" — I'll be in your neighborhood doing errands this…"}
-                                        </>
                                     }
                                     />
+                                    {player.isHost &&
+                                        <ListItemIcon sx={Style.listIcon}>
+                                            <StarRateIcon sx={Style.starIcon}/>
+                                        </ListItemIcon>
+                                    }
                             </ListItem>
                             {i < arr.length-1 && <Divider variant="inset" component="li" />}
                                                     
@@ -45,13 +80,16 @@ export const WaitingRoom = () =>{
                     )
                 })}
                 </List>
-                <Fab color="secondary" aria-label="add" sx={Style.backBtn}>
+                <Fab color="secondary" aria-label="add" sx={Style.backBtn} onClick={handleLeave}>
                     <ArrowBackIcon />
                 </Fab>
-                <Button sx={Style.startBtn} variant='contained' size="large">
+
+                {
+                players.find(e=>e.isHost==true).socketID == socket.id &&
+                <Button sx={Style.startBtn} variant='contained' size="large" onClick={handleOnClickStart}>
                     Start
                 </Button>
-               
+                }
         </Box>
     )
 }
@@ -69,17 +107,19 @@ const Style = {
     },
     listContainer: { 
         width: '100%', 
-        minheight: 350, 
+        minHeight: 350, 
         maxWidth: 600, 
         backgroundColor: 'grey.200',
-        overflow: 'scrollY'
+        p: 0
     },
     listItem: {
-        py: 0
+        py: 0,
+        height: 60
     },
     roomIdContainer: {
         backgroundColor: 'grey.200',
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         my: 2,
@@ -95,6 +135,17 @@ const Style = {
         position: 'absolute',
         right: 40,
         top: 40
+    },
+    listIcon: {
+        height: '100%',
+        m: 0,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    starIcon: {
+        transform: 'scale(1.3)',
+        fill: 'yellow'
     }
 }
 

@@ -1,6 +1,6 @@
 
 
-const socket = io('http://localhost:3000');
+const socket = io('http://localhost:3001');
 
 const suits = {
     spade: 0,
@@ -21,7 +21,6 @@ const PlayerStatus = {
 
 const client = {
     roomID: '',
-    players: [],
     gameRoom: {
         communityCards: [],
         players: [],

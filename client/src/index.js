@@ -1,11 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
+import AuthProvider from './components/ContextProvider/AuthProvider';
+import SocketContextProvider from './components/ContextProvider/SocketContextProvider';
+import UserProvider from './components/ContextProvider/UserProvider';
 
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <SocketContextProvider>
+      <AuthProvider>
+        <UserProvider>
+          <App />
+        </UserProvider>
+      </AuthProvider>
+    </SocketContextProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -1,361 +1,230 @@
 import { Server } from "socket.io";
-import poker from "./poker.js";
-import { generateGame} from './table.js'
-import { generateRoomID, swap, sleep } from "./ultility.js";
-import {PlayerStatus} from './enumeration.js'
+import socketInit from "./socket/socket.js";
+import express, { json } from 'express'
+import { createServer } from "http";
+import bcrypt from 'bcrypt'
 
-const io = new Server(3000, {
+import 'dotenv/config'
+import jwt from 'jsonwebtoken'
+import cors from 'cors';
+import { User} from "./mongoDB/model.js";
+import { sendConfirmationEmail, sendForgotPasswordEmail } from "./mail/mail.js";
+import {generateRoomID} from "./ultility.js"
+import multer from 'multer'
+import fs from 'fs'
+
+
+
+const storage = multer.memoryStorage()
+
+const upload = multer({storage: storage})
+const app = express()
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
   cors: {
     origin: "*",
   }
 })
 
+
 const games = {};
 
-io.on("connection", socket=>{
-  
-  console.log(socket.id);
-  
 
-  socket.on('createRoom', handleCreateRoom);
-  socket.on('joinRoom', handleJoinRoom);
-  socket.on('leaveRoom', handleLeaveRoom);
-  socket.on('option', handleOption);
-  socket.on('gameStart', handleGameStart);
+socketInit(io, games)
+
+httpServer.listen(3001);
 
 
 
-  function handleCreateRoom(name){
-    let roomID = generateRoomID(6);
-    games[roomID] = generateGame(roomID, 5);
-    socket.join(roomID);
-
-    games[roomID].addPlayer(name, socket.id, true);
-    console.log('room ' + roomID + ' created')
-    socket.emit('enterRoom', games[roomID].sendRoomInfo())
-  }
+app.use(express.json())
+app.use(cors())
 
 
 
-  function handleJoinRoom(name, roomID, errAlert){
-    if(games.hasOwnProperty(roomID)){
-      if(games[roomID].players.length < games[roomID].maxNumOfPlayers){
-        socket.join(roomID);
-        games[roomID].addPlayer(name, socket.id);
-  
-        io.to(roomID).emit('enterRoom', games[roomID].sendRoomInfo())
-      }
-      else{
-        errAlert('The room is full')
-      }
+app.post('/validation/email',  (req, res)=>{
+   User.find({email: req.body.email}, (err, results)=>{
+    if(results.length > 0){
+      res.json({
+        validation: false,
+        error: 'This email has been used'
+      })
     }
     else{
-      errAlert('Your room ID does not exist')
+      res.json({
+        validation: true,
+      })
     }
-  }
+})
+})
 
-  function handleLeaveRoom(roomID, info){
-    socket.leave(roomID);
-    if(games[roomID].players.find(player=>player.socketID == socket.id).host == true && games[roomID].players.length >= 2){
-
-      games[roomID].removePlayer(socket.id);
-      games[roomID].players[0].isHost=true;
-
-    }
-    else{
-      games[roomID].removePlayer(socket.id);
-
-    }
-
-    info('You leave the room successfully')
-
-    if(games[roomID].players.length == 0){
-      //remove thee room
-    }
-    io.to(roomID).emit('enterRoom', games[roomID].sendRoomInfo())
-  }
-
-
-
-  
-  async function handleOption(roomID, option, amount){
-    socket.emit('optionReceived');
-    switch(option){
-      case 'check':
-        games[roomID].players[games[roomID].playerInAction].status = PlayerStatus.acted;
-        
-        break;
-      case 'call':
-        if(games[roomID].players[games[roomID].playerInAction].chips + games[roomID].players[games[roomID].playerInAction].bet  <= games[roomID].existingBet){
-            games[roomID].players[games[roomID].playerInAction].status = PlayerStatus.allin;  
-            games[roomID].players[games[roomID].playerInAction].bet += games[roomID].players[games[roomID].playerInAction].chips ;  
-            games[roomID].players[games[roomID].playerInAction].chips = 0;
-        }
-        else{
-            games[roomID].players[games[roomID].playerInAction].status = PlayerStatus.acted;
-            games[roomID].players[games[roomID].playerInAction].chips -= games[roomID].existingBet -  games[roomID].players[games[roomID].playerInAction].bet;
-            games[roomID].players[games[roomID].playerInAction].bet = games[roomID].existingBet;
-        }
-
-        break;
-
-      case 'raise':
-
-        games[roomID].minimumRaise = amount
-        //reset the status of all the player who still in the games[roomID]
-        games[roomID].players = games[roomID].players.map((player)=>{
-            if(player.status != PlayerStatus.fold && player.status != PlayerStatus.allin && player.status != PlayerStatus.out){
-                player.status = PlayerStatus.waiting;
-            }
-            return player
-        })
-
-        if(amount - games[roomID].players[games[roomID].playerInAction].bet ==  games[roomID].players[games[roomID].playerInAction].chips){
-            games[roomID].players[games[roomID].playerInAction].status = PlayerStatus.allin;
-        }
-        else{
-            games[roomID].players[games[roomID].playerInAction].status = PlayerStatus.acted;
-        }
-        games[roomID].existingBet = amount;
-        games[roomID].players[games[roomID].playerInAction].chips -= games[roomID].existingBet -  games[roomID].players[games[roomID].playerInAction].bet;
-        games[roomID].players[games[roomID].playerInAction].bet = games[roomID].existingBet;
-
-
-        break;
-      case 'fold':
-        games[roomID].players[games[roomID].playerInAction].status = PlayerStatus.fold;
-
-
-
-        
-        break;
-    }
-
-    games[roomID].nextPlayer();
-      
-    io.in(roomID).emit('updatePlayersInfo',  JSON.stringify(games[roomID].players.map((player)=>{
-      return {
-        bet: player.bet,
-        chips: player.chips,
-        status: player.status
-      }
-    })))
-
-    //No need for betting
-    if(games[roomID].players.filter((player)=>{
-      return (player.status==PlayerStatus.acted || 
-      player.status==PlayerStatus.waiting || 
-      player.status==PlayerStatus.allin)}).length == 1 ){
-      games[roomID].potCalculation();
-      games[roomID].noPlayersCall();
-      
-      io.in(roomID).emit('updatePlayersInfo',  JSON.stringify(games[roomID].players.map((player)=>{
-        return {
-          bet: player.bet,
-          chips: player.chips,
-          status: player.status
-        }
-      })))
-      io.in(roomID).emit('updateWinner', JSON.stringify(games[roomID].winner));
-
-      
-      newHand(roomID)
-
-      return;
-    }
-
-    const numOfPlayersActed = games[roomID].players.filter((player)=>{return player.status==PlayerStatus.acted}).length
-    const numOfPlayersWaiting = games[roomID].players.filter((player)=>{return player.status==PlayerStatus.waiting}).length
-    const numOfPlayersAllin = games[roomID].players.filter((player)=>{ return player.status==PlayerStatus.allin}).length
-    
-    //Direct to Show Hand
-    if(numOfPlayersWaiting == 0 && numOfPlayersActed < 2 && numOfPlayersAllin + numOfPlayersActed >= 2){
-      const numOfStagesToShowHand = games[roomID].getNumOfStagesToShowHand()
-      for(let i=0; i< numOfStagesToShowHand; i++){
-          
-
-          await sleep(2000)
-          games[roomID].potCalculation();
-          games[roomID].nextStage();
-    
-          io.in(roomID).emit('updatePot', games[roomID].pot)
-          io.in(roomID).emit('updatePlayersInfo',  JSON.stringify(games[roomID].players.map((player)=>{
-            return {
-              bet: player.bet,
-              chips: player.chips,
-              status: player.status
-            }
-          })))
-    
-          io.in(roomID).emit('updateCommunityCards', JSON.stringify(games[roomID].communityCards));
-    
-          if(games[roomID].getStage() == 5){
-            io.in(roomID).emit('updateWinner', JSON.stringify(games[roomID].winner));
-            games[roomID].players.map((player, index)=>{
-              if(player.status != PlayerStatus.fold && player.status != PlayerStatus.out)
-              io.in(roomID).emit('updatePlayerHoleCards', 
-              JSON.stringify({
-                playerIndex: index,
-                holeCards: player.holeCards
-              }))
-            })
-            newHand(roomID)
-          }
-
-       
-      }
-
-      return;
-    }
-
-    //nextPlayer
-    //skip allin and fold player
-    while(games[roomID].players[games[roomID].playerInAction].status == PlayerStatus.allin || games[roomID].players[games[roomID].playerInAction].status == PlayerStatus.fold || games[roomID].players[games[roomID].playerInAction].status == PlayerStatus.out){
-      console.log('stuck')
-      games[roomID].nextPlayer();
-      
-    }
-
-    //bet end
-    if(games[roomID].players[games[roomID].playerInAction].status == PlayerStatus.acted){
-      games[roomID].potCalculation();
-
-      await sleep(2000)
-      games[roomID].nextStage();
-
-      io.in(roomID).emit('updatePot', games[roomID].pot)
-      io.in(roomID).emit('updatePlayersInfo',  JSON.stringify(games[roomID].players.map((player)=>{
-        return {
-          bet: player.bet,
-          chips: player.chips,
-          status: player.status
-        }
-      })))
-
-      io.in(roomID).emit('updateCommunityCards', JSON.stringify(games[roomID].communityCards));
-
-      if(games[roomID].getStage() == 5){
-        io.in(roomID).emit('updateWinner', JSON.stringify(games[roomID].winner));
-        games[roomID].players.map((player, index)=>{
-          if(player.status != PlayerStatus.fold && player.status != PlayerStatus.out)
-          io.in(roomID).emit('updatePlayerHoleCards', 
-          JSON.stringify({
-            playerIndex: index,
-            holeCards: player.holeCards
-          }))
-        })
-        newHand(roomID)
-        return;
-      }
-      else{
-        await sleep(2000)
-        io.in(roomID).emit('requestOption', games[roomID].players[games[roomID].playerInAction].socketID, playerOptions(roomID), games[roomID].minimumRaise, games[roomID].playerInAction, games[roomID].existingBet)
-      }
-
+app.post('/validation/userName', (req, res)=>{
+   User.find({userName:req.body.userName}, (err, results)=>{
+    if(results.length > 0){
+      res.json({
+        validation: false,
+        error: 'This userName has been used'
+      })
     }
     else{
-      io.in(roomID).emit('updatePlayersInfo',  JSON.stringify(games[roomID].players.map((player)=>{
-        return {
-          bet: player.bet,
-          chips: player.chips,
-          status: player.status
-        }
-      })))
-      
-      io.in(roomID).emit('requestOption', games[roomID].players[games[roomID].playerInAction].socketID, playerOptions(roomID), games[roomID].minimumRaise, games[roomID].playerInAction,  games[roomID].existingBet)
+      res.json({
+        validation: true,
+      })
     }
+})
+})
 
 
+app.post('/signUp', async (req, res)=>{
+  const {userName, password, email} = req.body;
+
+  const confirmationCode = generateRoomID(12)
+  try{
+    const hashedPassword = await bcrypt.hash(password, 10)
+    User.create({
+      userName,
+      email,
+      password: hashedPassword,
+      avatar: fs.readFileSync('./static/defaultAvatar.png'),
+      confirmationCode: confirmationCode,
+      isVerified: false
+    })
+    console.log('userCreated')
+    
+    sendConfirmationEmail(userName, email, confirmationCode)
+    res.status(201).send()
+  }
+  catch{
+    res.status(500).send()
   }
 
-  function handleGameStart(roomID, err){
-    if(games[roomID].players.length <2){
-      err('Not enough player');
-      return
-    }
-    //newhand
-    io.in(roomID).emit('gameStart', games[roomID].players.map((player)=>{
-      return {
-        name: player.name,
-        bet: player.bet,
-        chips: player.chips,
-        holeCards: []
+})
+
+app.post('/update/socketID', authenticateToken , async(req, res)=>{
+   if(req.user!=null){
+     req.user.socketID = req.body.socketID
+     req.user.save()
+   }
+})
+
+app.post('/login', async (req, res)=>{
+
+  const {userName, password} = req.body
+  const user = await User.findOne({userName: userName})
+  if(user==null){
+    res.status(400).send('Cannot find user')
+  }
+  try{
+    if(await bcrypt.compare(password, user.password)){
+      const payload = {
+        id: user.id
       }
-    }))
-    newHand(roomID)
-    
-  }
-
-  async function newHand(roomID){
-    await sleep(5000)
-    games[roomID].resetStage();
-    games[roomID].eliminatePlayers()
-
-    games[roomID].nextStage();
-    io.in(roomID).emit('updatePot', games[roomID].pot)
-    io.in(roomID).emit('updateCommunityCards', JSON.stringify(games[roomID].communityCards));
-    games[roomID].players.map((player, index)=>{    
-      io.in(roomID).emit('updatePlayerHoleCards', 
-      JSON.stringify({
-        playerIndex: index,
-        holeCards: player.holeCards
-      }))
-    })
-
-    //elinminate player before a hand start
-    
-
-    const playersSurvived = games[roomID].players.filter(player=>{
-      return player.status != PlayerStatus.out;
-    })
-
-    if(playersSurvived.length == 1){
-      //games end 
-      io.in(roomID).emit('gameEnd', playersSurvived[0].name)
-      return;
+      const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
+      res.json({accessToken: accessToken})
     }
+    else{
+      res.send('wrong password')
+    }
+  }
+  catch{
+    res.status(500).send()
+  }
+  //res.sendStatus(200)
+})
 
-
-    //preflop
-
-    games[roomID].nextStage() 
-
-    games[roomID].players.map((player, index)=>{
+app.post('/authenticate', authenticateToken, (req, res)=>{
   
-      io.to(player.socketID).emit('updatePlayerHoleCards', 
-      JSON.stringify({
-        playerIndex: index,
-        holeCards: player.holeCards
-      }))
-    })
- 
-    if(games[roomID].getPlayersNotOut().length > 2){
-      io.in(roomID).emit('updateDealer', games[roomID].getPreviousPlayer(games[roomID].sbPosition));
-    }else{
-      io.in(roomID).emit('updateDealer', -1);
+  res.sendStatus(200)
+})
+
+app.get('/auth/confirm/:confirmationCode', (req, res)=>{
+  User.findOne({confirmationCode: req.params.confirmationCode})
+  .then((user)=>{
+    if(user == null){
+      return res.status(404).send({message: "Invalid code"});
     }
 
-    io.in(roomID).emit('updatePlayersInfo',  JSON.stringify(games[roomID].players.map((player)=>{
-      return {
-        bet: player.bet,
-        chips: player.chips,
-        status: player.status
+    user.isVerified = true;
+    user.confirmationCode = undefined;
+    user.save((err)=>{
+      if(err){
+        res.status(500).send({message: err});
+        return
       }
-    })))
+    })
+    res.send({message: "Verification has done successfully"})
+  })
+})
 
+app.get('/auth/forgot/:userName', (req, res)=>{
+  User.findOne({userName: req.params.userName}).then((user)=>{
+    if(user==null){
+      return res.status(401).send({message: "User does not exist"})
+    }
+    const forgotCode = generateRoomID(12);
+    user.forgotCode = forgotCode
+    user.save()
+    sendForgotPasswordEmail(user.userName, user.email, forgotCode);
+    return res.send({message: "Reset Message has been sent"});
+  }).catch(err=>res.sendStatus(500))
+})
 
-    io.in(roomID).emit('requestOption', games[roomID].players[games[roomID].playerInAction].socketID, playerOptions(roomID), games[roomID].minimumRaise, games[roomID].playerInAction,  games[roomID].existingBet)
+app.post('/auth/reset/', (req, res)=>{
+  const {forgotCode, password} = req.body
+  User.findOne({forgotCode: forgotCode})
+  .then(async (user)=>{
+    if(user == null){
+      return res.status(404).send({message: "Invalid code"});
+    }
+    try{
+      const hashedPassword = await bcrypt.hash(password, 10)
+      user.password = hashedPassword;
+      user.forgotCode = undefined;
+      user.save((err)=>{
+        if(err){
+          return res.status(500).send({message: err});
+        }
+      })
+    }
+    catch{
+      return res.status(500).send({message: err});
+    }
+    res.send({message: "Password has been resetted"})
+  })
+})
+
+function authenticateToken(req, res, next){
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+  
+  if(token == null) return res.status(401).send({message: 'Please login'})
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async(err, user)=>{
+    
+    if(err) return res.sendStatus(403)
+    req.user = await User.findById(user.id)
+    next()
+  })
+}
+
+app.post('/upload/avatar', authenticateToken, upload.single('avatar'), async(req, res)=>{
+    req.user.avatar = req.file.buffer
+    await req.user.save()
+    console.log('done')
+    res.send({message: 'Upload Successfully'})
+})
+
+app.get('/users/avatar', authenticateToken, async(req,res)=>{
+
+  if(req.user.avatar){
+    res.set('Content-Type', 'image/png')
+    res.send(req.user.avatar)
+  }
+  else{
+    res.sendStatus(500)
   }
 })
 
-function playerOptions(roomID){
-
-  let nextPlayerOptions;
-    if(games[roomID].existingBet == games[roomID].players[games[roomID].playerInAction].bet){
-      nextPlayerOptions = 0;
-    }
-    else{
-      nextPlayerOptions = 1;
-    }
-  return nextPlayerOptions
-}
+app.get('/users/info', authenticateToken, async(req, res)=>{
+  res.json(req.user)
+})

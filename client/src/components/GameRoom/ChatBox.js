@@ -24,15 +24,13 @@ const Style = {
 
         justifyContent: 'center',
         alignItems: 'center',
-        height: 300,
-        width: 400,
         m: 0,
-        p: 0,
+        p: 1,
     },
     chatLog: {
         backgroundColor: 'lightGrey',
-        height: 200,
-        width: 370,
+        height: 180,
+        width: 350,
         my: 1,
         borderRadius: 5,
     },

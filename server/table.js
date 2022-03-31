@@ -7,11 +7,12 @@ function generatePlayer(name, chip = 200, socketID, isHost=false){
         name: name,
         chips: chip,
         bet: 0,
-        status: PlayerStatus.waiting,
+        status: PlayerStatus.idle,
         pot: 0,
         holeCards: [],
         socketID: socketID,
         isHost: isHost,
+        
 
         setHoleCards: function(holeCards){
             this.holeCards.push([...holeCards])
@@ -27,9 +28,10 @@ function generatePlayer(name, chip = 200, socketID, isHost=false){
     }
 }
 
-function generateGame(id, maxNumOfPlayers=4, initialChips=200, minimumBet=2){
+function generateGame(id, roomName, maxNumOfPlayers=8, initialChips=200, minimumBet=2){
     return ({
     ID: id,
+    name: roomName,
     players: [],
     maxNumOfPlayers: maxNumOfPlayers,
 
@@ -44,6 +46,7 @@ function generateGame(id, maxNumOfPlayers=4, initialChips=200, minimumBet=2){
     minimumRaise: 0,
 
     stage: -1,
+    timeOut:{id: -1, socketID:''},
     
     playerInAction: 0,
     currentPot: 0,
@@ -170,6 +173,15 @@ function generateGame(id, maxNumOfPlayers=4, initialChips=200, minimumBet=2){
 
             //preflop
             case 1:
+                this.players = this.players.map((player)=>{
+                    if(player.status != PlayerStatus.out){
+                        player.status = PlayerStatus.waiting;
+                    }
+                    player.bet = 0;
+                    player.pot = 0;
+                    player.holeCards = []
+                    return player;
+                });
                 //preflop bet condition
                 this.existingBet = this.minimumBet
 
@@ -365,6 +377,7 @@ function generateGame(id, maxNumOfPlayers=4, initialChips=200, minimumBet=2){
         return JSON.stringify(
             {
                 ID: this.ID,
+                name: this.name,
                 players: this.players
             }
         )

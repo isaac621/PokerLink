@@ -1,33 +1,52 @@
 import { Typography, Box } from '@mui/material';
+import { yellow } from '@mui/material/colors';
+import { useGameContext } from '../ContextProvider/GameContextProvider';
 import PokerCard from './PokerCard';
 
-export const TableCenter = ({communityCards}) =>{
+const CommunityCards = ({communityCards})=>{
+    const emptyCards = new Array(5-communityCards.length).fill(0)
+    return(
+        <>
+        {communityCards.map((card, i)=>{
+            return(<PokerCard key={i} card={card}/>)
+        })}
+        {emptyCards.map((card, i)=>{
+            return (<PokerCard key={i+10} empty/>)
+        })}
+        </>
+    )
+}
+
+export const TableCenter = () =>{
+    const {communityCards, pots} = useGameContext()
+    
     return(
         <Box sx={Style.container}>
+            <Box sx={Style.totalPotContainer}>
+                {pots.reduce((prev,pot)=>(prev+pot), 0) > 0 &&
+                <Typography  sx={Style.totalPot}>
+                    Total Pots: {pots.reduce((prev,pot)=>(prev+pot), 0)}
+                </Typography>}
+            </Box>
             <Box sx={Style.communityCards}>
-                {communityCards && communityCards.map((card, i)=>{
-                    return(
-                        <PokerCard key={i} cardIndex={card.cardIndex}/>
-                    )
-                })}
-                
+                <CommunityCards communityCards={communityCards}/>                
             </Box>
             <Box sx={Style.pots}>
-                <Box sx={Style.potContainer}>
-                    <Typography>
-                        500
-                    </Typography>
-                </Box>
-                <Box sx={Style.potContainer}>
-                    <Typography>
-                        500
-                    </Typography>
-                </Box>
-                <Box sx={Style.potContainer}>
-                    <Typography>
-                        500
-                    </Typography>
-                </Box>
+                {
+                    pots.map((pot, i)=>{
+                        if(pot != 0){
+                            return(
+                                <Box key={i} sx={Style.potContainer}>
+                                    <Typography>
+                                        {pot}
+                                    </Typography>
+                                </Box>
+                            )
+                        }
+                        
+                    })
+                }
+
             </Box>
         </Box>
     )
@@ -61,5 +80,20 @@ const Style = {
         width: 60,
         borderRadius: 20,
         mx: 1
+    },
+    totalPotContainer: {
+        width: '100%',
+        height: 40,
+        display: 'flex',
+        justifyContent:'center',
+        alignItems: 'center',
+        mb: 2
+    },
+    totalPot: {
+        bgcolor: 'rgba(0, 0, 0, 0.5)',
+        px: 3,
+        py: 0.2,
+        borderRadius: 20,
+        color: yellow[700]
     }
 }

@@ -3,12 +3,38 @@ import {
     H2, H3, H4, H5, H6, H7, H8, H9, H10, H11, H12, H13, H14,
     C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14,
     D2, D3, D4, D5, D6, D7, D8, D9, D10, D11, D12, D13, D14,
-    Back
+    Back, Empty
 } from '../../assets/img/pokers/index'
 
-const PokerCard = ({cardIndex}) =>{
-    const chooseCards = (cardIndex) =>{
-        switch(cardIndex){
+function cardIndex(card){
+    const cardIndex = []
+    if(card){
+        switch(card.suit){
+            case 0:
+                cardIndex.push('S');
+                break;
+            case 1:
+                cardIndex.push('H');
+                break;
+            case 2:
+                cardIndex.push('C');
+                break
+            case 3:
+                cardIndex.push('D');
+                break;
+        }
+
+        cardIndex.push(card.number)
+        return cardIndex.join('')
+    }
+    else{
+        return '';
+    }
+}
+
+const PokerCard = ({card, empty}) =>{
+    const chooseCards = (card)=>{
+        switch(card){
             case 'S2':
                 return S2;
             case 'S3':
@@ -120,7 +146,7 @@ const PokerCard = ({cardIndex}) =>{
 
         return(
             <img
-                src = {chooseCards(cardIndex)}
+                src = {empty ? Empty : chooseCards(cardIndex(card))}
                 style = {Style.card}
                 alt = 'poker'
             />
@@ -129,7 +155,7 @@ const PokerCard = ({cardIndex}) =>{
 
 const Style = {
     card: {
-        width: 70,
+        height: 100,
         borderRadius: 8
     }
 }
