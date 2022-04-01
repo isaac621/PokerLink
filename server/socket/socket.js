@@ -1,14 +1,14 @@
-import { generateGame} from '../table.js'
+import { generateGame} from '../gameLogic/table.js'
 import { generateRoomID, swap, sleep } from "../ultility.js";
-import {PlayerStatus} from '../enumeration.js'
-
+import {PlayerStatus} from '../gameLogic/enumeration.js'
+import { User } from '../mongoDB/model.js';
 
 export default function socketInit(io, games){
     io.on("connection", socket=>{
-  
+        
         console.log(socket.id);
         
-      
+        socket.on('leaveGame', handleLeaveGame)
         socket.on('createRoom', handleCreateRoom);
         socket.on('joinRoom', handleJoinRoom);
         socket.on('leaveRoom', handleLeaveRoom);
@@ -20,23 +20,33 @@ export default function socketInit(io, games){
             console.log('disconnected')
         }
       
-        function handleCreateRoom(name, roomName){
+        async function handleCreateRoom(name, roomName){
           let roomID = generateRoomID(6);
           games[roomID] = generateGame(roomID, roomName, 8);
           socket.join(roomID);
-      
-          games[roomID].addPlayer(name, socket.id, true);
+          const user = await User.findOne({socketID: socket.id})
+          const userId = user._id;
+          user.roomID = roomID;
+          user.isGaming = true;
+          await user.save()
+          games[roomID].addPlayer(userId, name, socket.id, true);
           console.log('room ' + roomID + ' created')
           socket.emit('enterRoom', games[roomID].sendRoomInfo())
         }
       
       
       
-        function handleJoinRoom(name, roomID){
+        async function handleJoinRoom(name, roomID){
           if(games.hasOwnProperty(roomID)){
             if(games[roomID].players.length < games[roomID].maxNumOfPlayers){
               socket.join(roomID);
-              games[roomID].addPlayer(name, socket.id);
+              const user = await User.findOne({socketID: socket.id})
+              console.log(user)
+              const userId = user._id;
+              user.roomID = roomID;
+              user.isGaming = true;
+              await user.save()
+              games[roomID].addPlayer(userId, name, socket.id);
         
               io.to(roomID).emit('enterRoom', games[roomID].sendRoomInfo())
             }
@@ -50,7 +60,7 @@ export default function socketInit(io, games){
           }
         }
       
-        function handleLeaveRoom(roomID, info){
+        async function handleLeaveRoom(roomID, info){
           socket.leave(roomID);
           if(games[roomID].players.find(player=>player.socketID == socket.id).isHost == true && games[roomID].players.length >= 2){
       
@@ -62,13 +72,27 @@ export default function socketInit(io, games){
             games[roomID].removePlayer(socket.id);
       
           }
-      
+          const user = await User.findOne({socketID: socket.id})
+          user.isGaming =false;
+          user.roomID = null;
+          await user.save()
           info('You leave the room successfully')
       
           if(games[roomID].players.length == 0){
             //remove the room
           }
           io.to(roomID).emit('enterRoom', games[roomID].sendRoomInfo())
+        }
+
+        async function handleLeaveGame(roomID, cb){
+          socket.leave(roomID);
+          const user = await User.findOne({roomID: roomID})
+          if(user){
+            user.isGaming =false;
+            user.roomID = null;
+            await user.save()
+          }
+          cb()
         }
       
       
@@ -287,14 +311,29 @@ export default function socketInit(io, games){
       
       
         }
+        function playerOptions(roomID){
       
+          let nextPlayerOptions;
+            if(games[roomID].existingBet == games[roomID].players[games[roomID].playerInAction].bet){
+              nextPlayerOptions = {check: true, raise: true, fold: true, call: false};
+            }
+            else{
+              nextPlayerOptions = {check: false, raise: true, fold: true, call: true};
+            }
+          return nextPlayerOptions
+        }
         function handleGameStart(roomID, err){
+          
           if(games[roomID].players.length <2){
             //not enoughPlayer
             return
           }
           //newhand
+          (async()=>{
+            await User.updateMany({roomID: roomID}, {isGaming: true})
+          })()
           io.in(roomID).emit('gameStart', games[roomID].players)
+          games[roomID].start()
           newHand(roomID)
           
         }
@@ -319,17 +358,7 @@ export default function socketInit(io, games){
             }))
           })
       
-          function playerOptions(roomID){
-      
-            let nextPlayerOptions;
-              if(games[roomID].existingBet == games[roomID].players[games[roomID].playerInAction].bet){
-                nextPlayerOptions = {check: true, raise: true, fold: true, call: false};
-              }
-              else{
-                nextPlayerOptions = {check: false, raise: true, fold: true, call: true};
-              }
-            return nextPlayerOptions
-          }
+         
       
           //elinminate player before a hand start
           
@@ -341,6 +370,17 @@ export default function socketInit(io, games){
           if(playersSurvived.length == 1){
             //games end 
             io.in(roomID).emit('gameEnd', playersSurvived[0].name)
+            
+            const update = async()=>{
+              const user = await User.updateMany({roomID: roomID},
+                {
+                roomID : null,
+                isGaming : false})
+
+              }
+            update()
+            io.in(roomID).socketsLeave(roomID)
+
             return;
           }
       

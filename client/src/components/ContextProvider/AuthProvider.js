@@ -23,6 +23,19 @@ const AuthProvider = ({children})=>{
         return res
     }
 
+    const adminAuthenticate = async()=>{
+        const res = await fetch(`${serverHost}/admin/authenticate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+            },
+            
+        }).then(res=>res.ok)
+        
+        return res
+    }
+
     const login = async (data)=>{
         const response = await fetch(`${serverHost}/login`, {
             method: 'POST',
@@ -41,6 +54,17 @@ const AuthProvider = ({children})=>{
         return response
     }
 
+    const adminLogin = async (data)=>{
+        const response = await fetch(`${serverHost}/admin/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).catch(err=>console.log(err))
+        return response
+    }
+
     const signUp = async (data)=>{
         return  await fetch(`${serverHost}/signUp`, {
             method: 'POST',
@@ -52,12 +76,8 @@ const AuthProvider = ({children})=>{
         
     }
 
-    const forgotPassword = ()=>{
-
-    }
-
     const value ={
-        login, signUp, authenticate
+        login, signUp, authenticate, adminLogin, adminAuthenticate
     }
     
 

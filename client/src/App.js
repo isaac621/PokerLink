@@ -2,16 +2,18 @@ import { GameRoom } from './components/GameRoom/GameRoom';
 import { WaitingRoom } from './components/WaitingRoom/WaitingRoom';
 import { Lobby } from './components/Lobby/Lobby';
 import SocketContextProvider, { useSocket } from './components/ContextProvider/SocketContextProvider';
-import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
-import GameContextProvider from './components/ContextProvider/GameContextProvider';
+import {BrowserRouter, Routes, Route, Navigate, useNavigate} from 'react-router-dom';
+import GameContextProvider, { useGameContext } from './components/ContextProvider/GameContextProvider';
 import { useEffect, useState } from 'react';
 import { StatusBar } from './components/GameRoom/StatusBar';
-import { Login, SignUp, Verify, ForgotPassword, ResetPassword, Edit } from './components/UserRelated/';
+import { Login, SignUp, Verify, ForgotPassword, ResetPassword, Edit, AdminLogin, AdminEdit} from './components/UserRelated/';
 import AuthProvider, { useAuth } from './components/ContextProvider/AuthProvider';
 import { PrivateRoute } from './PrivateRoute';
 import { VisitorRoute } from './VisitorRoute';
 import UserProvider, { useUser } from './components/ContextProvider/UserProvider';
 import { CircularProgress } from '@mui/material';
+import { AdminRoute } from './AdminRoute';
+import { serverHost } from './constant';
 
 
 
@@ -29,56 +31,80 @@ const PlayerStatus = {
 
 function App() {
   const {socket, setSocket} = useSocket();
+  const {setRoomID, setPlayers, setRoomName} = useGameContext();
+  const [busy, setBusy] = useState(true)
+  const navigate = useNavigate()
 
-
-  let player;
-  useEffect(()=>{
-
-  })
-
-  if(socket){
-    player = {
-      name: 'nde',
-      chips: 300,
-      bet: 30,
-      status: PlayerStatus.allin,
-      pot: 0,
-      holeCards: [{suit:0, number:14}, {suit:2, number:13}],
-      socketID: socket.id,
-      isHost: true}
+  const handleEnterRoom = async (roomJSON)=>{
+    const room = JSON.parse(roomJSON);
+    setRoomID(room.ID);
+    setPlayers(room.players);
+    setRoomName(room.name)
+    navigate('/waitingRoom');
   }
 
-  const {avatar} = useUser();
-  console.log(avatar, socket)
+  function handleGameStart(players){
+      setPlayers(players);
+      navigate('/gameRoom')
+  }
+
+  useEffect(async()=>{
+    if(socket){
+      socket.on('enterRoom', handleEnterRoom);
+      socket.on('gameStart', handleGameStart);
+      const res = await fetch(`${serverHost}/game/gameInfo`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+        },
+        body: JSON.stringify({
+            socketID: socket.id
+        })
+      }).then(res=>res.json()).catch(err=>false)
+      if(res){
+        const data = JSON.parse(res)
+        console.log(data.players)
+        setRoomID(data.ID);
+        setPlayers(data.players);
+        setRoomName(data.name)
+      
+      }
+      
+      setBusy(false)
+      }
+  }, [])
+
+
+
+  
   return (
-    <GameContextProvider>
-   
-          <BrowserRouter>
-              {(socket) ?
 
-              <Routes>
-                <Route exact path='/gameRoom' element={<PrivateRoute><GameRoom/></PrivateRoute>}/>
-                <Route exact path='/waitingRoom' element={<PrivateRoute><WaitingRoom/></PrivateRoute>}/>
-                <Route exact path='/lobby' element={<PrivateRoute><Lobby/></PrivateRoute>}/>
-                <Route exact path='/' element={ <VisitorRoute><Login/></VisitorRoute>}/>
-                <Route exact path='/login' element={<VisitorRoute><Login/></VisitorRoute>}/>
-                <Route exact path='/signUp' element={<VisitorRoute><SignUp/></VisitorRoute>}/>
-                <Route exact path='/verify' element={<Verify/>}/>
-                <Route exact path='/forgot' element={<ForgotPassword/>}/>
-                <Route exact path='/reset' element={<ResetPassword/>}/>
-                <Route exact path='/edit' element={<Edit/>}/>
-              </Routes> 
-              :
-              <CircularProgress />
-              }
+    <>
+      {!busy ?
+
+      <Routes>
+        <Route exact path='/gameRoom' element={<PrivateRoute><GameRoom/></PrivateRoute>}/>
+        <Route exact path='/waitingRoom' element={<PrivateRoute><WaitingRoom/></PrivateRoute>}/>
+        <Route exact path='/lobby' element={<PrivateRoute><Lobby/></PrivateRoute>}/>
+        <Route exact path='/' element={ <VisitorRoute><Login/></VisitorRoute>}/>
+        <Route exact path='/login' element={<VisitorRoute><Login/></VisitorRoute>}/>
+        <Route exact path='/signUp' element={<VisitorRoute><SignUp/></VisitorRoute>}/>
+        <Route exact path='/verify' element={<Verify/>}/>
+        <Route exact path='/forgot' element={<ForgotPassword/>}/>
+        <Route exact path='/reset' element={<ResetPassword/>}/>
+        <Route exact path='/edit' element={<Edit/>}/>
+        
+        <Route exact path='/admin/login' element = {<VisitorRoute><AdminLogin/></VisitorRoute>}/>
+        <Route exact path='/admin/edit' element={<AdminRoute><AdminEdit/></AdminRoute>}/>
+      </Routes> 
+      :
+      <CircularProgress />
+      }
               
-          </BrowserRouter>
-
-      {/* <div style={{margin: 100, backgroundColor: 'grey', height: 500, width: 500, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-        {socket && player?<StatusBar player={player} pos={5} />:'not ready'}
-      </div> */}
-    </GameContextProvider>
-
+ 
+  
+    </>
   );
 }
 

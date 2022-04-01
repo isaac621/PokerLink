@@ -1,4 +1,4 @@
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, CircularProgress } from '@mui/material';
 import profilePic from '../../assets/img/profilePic.png'
 import PokerCard from './PokerCard';
 import { PlayerStatus } from '../../assets/utils/enumeration';
@@ -6,7 +6,7 @@ import { teal } from '@mui/material/colors';
 import dealerBtn from '../../assets/img/dealerBtn.png'
 import { useSpring, animated } from 'react-spring'
 
-const ProfilePic = ({inAction})=>{
+const ProfilePic = ({inAction, img})=>{
     const blinkBorder = useSpring({
         from: {
             border: '5px solid rgba(114, 255, 230, 0)'
@@ -22,17 +22,21 @@ const ProfilePic = ({inAction})=>{
             ...blinkBorder,
             ...Style.profileImgContainer
         } : Style.profileImgContainer}
-        >
+        >   
+        {
+            !img ? <CircularProgress color="secondary"/>:
             <img 
-                        style={Style.profileImg} 
-                        src= {profilePic}
-                        alt='profilePic'
-                />
+            style={Style.profileImg} 
+            src= {img}
+            alt='profilePic'
+    />
+        }
+           
         </animated.div>
     )
 }
 
-export const StatusBar = ({player, pos, dealer, inAction}) =>{
+export const StatusBar = ({player, pos, dealer, inAction, img}) =>{
     
 
     function determineBetDisplayPos(pos){
@@ -74,7 +78,7 @@ export const StatusBar = ({player, pos, dealer, inAction}) =>{
     return(
         <Box sx={{...Style.container, opacity: player.status == PlayerStatus.out && '40%'}}>
             <Box sx={{...Style.pillContainer, bgcolor: player.status == PlayerStatus.allin ?'red': 'primary.dark',}}>
-                <ProfilePic inAction={inAction}/>
+                <ProfilePic inAction={inAction} img={img}/>
                 <Box sx={Style.InfosContainer}>
                     <Box sx={{...Style.fontContainer, ...Style.nameContainer}}>
                         <Typography>

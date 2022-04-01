@@ -1,4 +1,4 @@
-import {swap} from './ultility.js'
+import {swap} from '../ultility.js'
 import { cardsCompare, generateRank } from './generateRank.js'
 
 const suits = {

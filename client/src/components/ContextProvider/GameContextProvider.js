@@ -15,6 +15,9 @@ const GameContextProvider = ({children}) =>{
     const [pots, setPots] = useState([]);
     const [dealerPos, setDealerPos] = useState(-1);
     const [sb, setSb] = useState(1);
+    const [end, setEnd] = useState(false);
+
+    const [playersAvatar, setPlayersAvatar] = useState()
 
     const [options, setOptions] = useState({check: false, raise: false, call: false, fold:false})
 
@@ -28,6 +31,7 @@ const GameContextProvider = ({children}) =>{
         setPots([]);
         setDealerPos(-1);
         setOptions({check: false, raise: false, call: false, fold:false});
+        setEnd(false)
     }
 
     const value = {
@@ -42,7 +46,8 @@ const GameContextProvider = ({children}) =>{
         dealerPos, setDealerPos,
         sb, setSb,
         options, setOptions,
-        resetGameContext
+        resetGameContext,
+        playersAvatar, setPlayersAvatar, end, setEnd
     }
 
     return(

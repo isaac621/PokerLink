@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import AuthProvider from './components/ContextProvider/AuthProvider';
+import GameContextProvider from './components/ContextProvider/GameContextProvider';
 import SocketContextProvider from './components/ContextProvider/SocketContextProvider';
 import UserProvider from './components/ContextProvider/UserProvider';
 
@@ -11,7 +13,11 @@ ReactDOM.render(
     <SocketContextProvider>
       <AuthProvider>
         <UserProvider>
-          <App />
+          <GameContextProvider>
+            <BrowserRouter>
+              <App/>
+            </BrowserRouter>
+          </GameContextProvider>
         </UserProvider>
       </AuthProvider>
     </SocketContextProvider>

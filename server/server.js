@@ -7,12 +7,13 @@ import bcrypt from 'bcrypt'
 import 'dotenv/config'
 import jwt from 'jsonwebtoken'
 import cors from 'cors';
-import { User} from "./mongoDB/model.js";
+import { Admin, User} from "./mongoDB/model.js";
 import { sendConfirmationEmail, sendForgotPasswordEmail } from "./mail/mail.js";
 import {generateRoomID} from "./ultility.js"
 import multer from 'multer'
 import fs from 'fs'
-
+import mongoose from "mongoose";
+import { db } from "./mongoDB/connection.js";
 
 
 const storage = multer.memoryStorage()
@@ -35,6 +36,11 @@ socketInit(io, games)
 
 httpServer.listen(3001);
 
+async function resetDB(){
+  const res = await User.updateMany({}, {isGaming: false, roomID: null})
+
+}
+resetDB()
 
 
 app.use(express.json())
@@ -102,13 +108,40 @@ app.post('/signUp', async (req, res)=>{
 
 app.post('/update/socketID', authenticateToken , async(req, res)=>{
    if(req.user!=null){
+  
      req.user.socketID = req.body.socketID
-     req.user.save()
+     await req.user.save()
+     
+     res.send()
+   }
+   else{
+     res.sendStatus(400)
    }
 })
 
-app.post('/login', async (req, res)=>{
+app.post('/game/gameInfo', authenticateToken, (req, res)=>{
+  console.log(req.body)
+  if(req.user.roomID){
+    games[req.user.roomID].players = games[req.user.roomID].players.map((player)=>{
+      
+      if(player.id.equals(req.user._id)){
+      
+        player.socketID = req.body.socketID
+       io.sockets.sockets.get(req.body.socketID).join(req.user.roomID);
+        
+      }
+      return player
+    })
 
+    res.json(games[req.user.roomID].sendReconnectRoomInfo(req.body.socketID))
+    return
+ }
+
+ res.send()
+})
+
+app.post('/login', async (req, res)=>{
+  console.log('login')
   const {userName, password} = req.body
   const user = await User.findOne({userName: userName})
   if(user==null){
@@ -132,7 +165,14 @@ app.post('/login', async (req, res)=>{
   //res.sendStatus(200)
 })
 
+
+
+
 app.post('/authenticate', authenticateToken, (req, res)=>{
+  res.sendStatus(200)
+})
+
+app.post('/admin/authenticate', authenticateAdminToken, (req, res)=>{
   
   res.sendStatus(200)
 })
@@ -193,19 +233,7 @@ app.post('/auth/reset/', (req, res)=>{
   })
 })
 
-function authenticateToken(req, res, next){
-  const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1]
-  
-  if(token == null) return res.status(401).send({message: 'Please login'})
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async(err, user)=>{
-    
-    if(err) return res.sendStatus(403)
-    req.user = await User.findById(user.id)
-    next()
-  })
-}
 
 app.post('/upload/avatar', authenticateToken, upload.single('avatar'), async(req, res)=>{
     req.user.avatar = req.file.buffer
@@ -225,6 +253,146 @@ app.get('/users/avatar', authenticateToken, async(req,res)=>{
   }
 })
 
+app.get('/users/avatar/:id', authenticateToken, async(req, res)=>{
+  const user = await User.findById(req.params.id)
+  if(user.avatar){
+    res.set('Content-Type', 'image/png')
+    res.send(user.avatar)
+  }
+  else{
+    res.sendStatus(500)
+  }
+})
+
 app.get('/users/info', authenticateToken, async(req, res)=>{
   res.json(req.user)
 })
+
+app.post('/admin/login', async (req, res)=>{
+  
+  const {userName, password} = req.body
+  const user = await Admin.findOne({userName: userName})
+  if(user==null){
+    res.status(400).send({message: "Cannot find user"})
+  }
+  try{
+    if(await bcrypt.compare(password, user.password)){
+      const payload = {
+        id: user.id
+      }
+      const accessToken = jwt.sign(payload, process.env.ADMIN_ACCESS_TOKEN_SECRET)
+      res.json({accessToken: accessToken, message: 'Login Successfully'})
+    }
+    else{
+      res.send({message: 'wrong password'})
+    }
+  }
+  catch{
+    res.status(500).send()
+  }
+  //res.sendStatus(200)
+})
+
+app.post('/admin/search', authenticateAdminToken, async(req, res)=>{
+  res.send(await User.find(req.body));
+
+})
+
+app.post('/admin/getUser/:id', authenticateAdminToken, async(req, res)=>{
+  res.send(await User.findById(req.params.id))
+})
+
+app.get('/admin/getUser/avatar/:id', authenticateAdminToken, async(req, res)=>{
+  const user = await User.findById(req.params.id)
+  if(user && user.avatar){
+    res.set('Content-Type', 'image/png')
+    res.send(user.avatar)
+  }
+  else{
+    res.sendStatus(500)
+  }
+})
+
+
+app.post('/admin/update/user', authenticateAdminToken, upload.single('avatar'), async(req, res)=>{
+  try{
+    const user= await User.findById(req.body._id);
+    if(req.file != null){
+      console.log('avatarUpdated')
+      user.avatar = req.file.buffer
+    }
+    user.userName = req.body.userName
+    user.isVerified = req.body.isVerified
+    await user.save()
+    console.log('updated')
+    res.send({message: 'Update Successfully'})
+  }
+  catch{
+    res.status(401).send({message: 'Username has been used'})
+  }
+})
+
+app.post('/admin/resetPassword/:id',authenticateAdminToken, async(req,res)=>{
+  const user = await User.findById(req.params.id)
+  if(user == null){
+    res.status(401).send({message: "User not found"})
+  }
+  try{
+    const hashedPassword = await bcrypt.hash(req.body.password, 10)
+    
+    user.password = hashedPassword
+    await user.save()
+    res.send({message: 'Password has been resetted'})
+  }
+  catch{
+    res.status(500).send({message: "Server Error"})
+  }
+})
+
+
+app.get('/game/gameState', authenticateToken, (req, res)=>{
+  const userState = req.user.isGaming
+  if(userState){
+    if(games[req.user.roomID].started){
+      res.json({path:'/gameRoom'})
+    }
+    else{
+      res.json({path:'/waitingRoom'})
+    }
+  }
+  else{
+    res.json({path:'/lobby'})
+  }
+
+
+})
+
+function authenticateToken(req, res, next){
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+  
+  if(token == null) return res.status(401).send({message: 'Please login'})
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async(err, user)=>{
+    
+    if(err) return res.sendStatus(403)
+    req.user = await User.findById(user.id)
+    next()
+  })
+  
+}
+
+function authenticateAdminToken(req, res, next){
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+  
+  if(token == null) return res.status(401).send({message: 'Please login'})
+
+  jwt.verify(token, process.env.ADMIN_ACCESS_TOKEN_SECRET, async(err, user)=>{
+    
+    if(err) return res.sendStatus(403)
+    req.admin = await Admin.findById(user.id)
+    next()
+  })
+  
+}

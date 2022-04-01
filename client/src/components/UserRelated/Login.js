@@ -1,7 +1,9 @@
 import { Box, TextField, Button, Typography } from "@mui/material"
+import { blue } from "@mui/material/colors";
 import { useContext, useEffect, useState } from "react"
 import { Link, useNavigate,  } from "react-router-dom";
 import { useAuth } from "../ContextProvider/AuthProvider";
+import { useUser } from "../ContextProvider/UserProvider";
 
 
 
@@ -18,12 +20,15 @@ export const Login = () =>{
 
     const [error, setError] = useState();
 
+    const {updateUser} = useUser();
+
     const handleLogin = async() =>{
         await auth.login({userName, password}).then(res=>{
             if(res){
                localStorage.setItem('jwt', res.accessToken)
             }})
-        navigate('/lobby', {replace: true})
+        updateUser().then( navigate('/lobby', {replace: true}))
+       
         
     }
     
@@ -41,6 +46,11 @@ export const Login = () =>{
             <Typography variant="caption" display="block" >
                 Not registered? <Link to='/signUp'>Create an account</Link> | <Link to='/forgot'>Forgot Password</Link>
             </Typography>
+                <Link to='/admin/login' style={Style.link}>
+                    <Button variant="contained" >
+                        Admin User
+                    </Button>
+                </Link>
         </Box>
     )
 }
@@ -60,5 +70,9 @@ const Style = {
     },
     formItem: {
         my: 1
+    },
+    link:{
+        color: 'white',
+        textDecoration: 'none'
     }
 }

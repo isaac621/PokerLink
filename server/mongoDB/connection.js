@@ -10,3 +10,4 @@ db.once('open', function(){
 })
 
 export default mongoose
+export {db}

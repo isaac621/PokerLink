@@ -13,6 +13,8 @@ import { PlayerStatus } from '../../assets/utils/enumeration';
 import { useNavigate } from "react-router-dom";
 
 import { EndingScreen } from './EndingScreen';
+import { useUser } from '../ContextProvider/UserProvider';
+import { serverHost } from '../../constant';
 
 
 export const GameRoom = () =>{
@@ -28,14 +30,16 @@ export const GameRoom = () =>{
         dealerPos, setDealerPos,
         sb, setSb,
         setOptions,
-        resetGameContext
+        resetGameContext,
+        playersAvatar, setPlayersAvatar, setEnd
     } = useGameContext();
     const navigate = useNavigate();
 
     const [gameEnd, setGameEnd] =useState(false);
     const [winner, setWinner] = useState('');
+    
 
-    useEffect(()=>{
+    useEffect(async()=>{
         socket.on('updateDealer', (dealerPos)=>setDealerPos(dealerPos))
         socket.on('updatePlayerHoleCards', handleUpdatePlayerHoleCards);
         socket.on('updatePlayersInfo', handleUpdatePlayersInfo)
@@ -44,13 +48,25 @@ export const GameRoom = () =>{
         socket.on('optionReceived', handleOptionReceived)
         socket.on('updatePot', handleUpdatePot)
         socket.on('updateSb', (sb)=>setSb(sb))
-
         socket.on('gameEnd', handleGameEnd)
+        const avatars = [];
 
+        players.map(async(player)=>{
+            const avatar = await fetch(`${serverHost}/users/avatar/${player.id}`, {
+                method: 'GET',
+                headers:{
+                    'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+                },
+            }).then(res=>res.blob()).then(res=>URL.createObjectURL(res)).catch(err=>console.log(err))
+            avatars.push(avatar)
+        })
+        console.log(avatars, 111)
+        setPlayersAvatar(avatars)
     }, [])
 
     function handleGameEnd(name){
         setWinner(name);
+        setEnd(true);
         setGameEnd(true);
     }
 
@@ -112,7 +128,9 @@ export const GameRoom = () =>{
 
     function handleOnClickLeave(){
         resetGameContext();
-        navigate('/lobby', {replace: true});
+        socket.emit('leaveGame', roomID, ()=>{
+            navigate('/lobby', {replace: true})});
+        
     }
 
 
@@ -135,7 +153,7 @@ export const GameRoom = () =>{
                     {players.map((player, index)=>{
                         return(
                             <Box key={index} sx={{gridArea: `p${index}`,...Style.statusBarContainer}}>
-                                <StatusBar player={player} pos={index} dealer={dealerPos == index} inAction={playerInAction==index}/>
+                                <StatusBar player={player} pos={index} dealer={dealerPos == index} inAction={playerInAction==index} img={playersAvatar && playersAvatar[index]}/>
                             </Box>
                         )
                     })}

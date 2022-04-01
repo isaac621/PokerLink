@@ -8,8 +8,9 @@ const UserProvider = ({children})=>{
     const [avatar, setAvatar] = useState();
     const [id, setId] = useState('');
     const [userName, setUserName] = useState('');
+    
 
-    useEffect(async()=>{
+    const updateUser = async()=>{
         const user = await fetch(`${serverHost}/users/info`, {
             method: 'GET',
             headers:{
@@ -25,11 +26,10 @@ const UserProvider = ({children})=>{
             },
         }).then(res=>res.blob()).then(res=>URL.createObjectURL(res))
         setAvatar(avatar)
+    }
 
-
-    }, [])
-
-    const value = {avatar, userName, id}
+    
+    const value = {avatar, userName, id, updateUser, }
 
     return(
         <UserContext.Provider value={value}>

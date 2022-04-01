@@ -1,4 +1,4 @@
-import {swap} from './ultility.js'
+import {swap} from '../ultility.js'
 import { Suits } from './enumeration.js';
 
 

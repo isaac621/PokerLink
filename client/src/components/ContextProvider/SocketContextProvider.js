@@ -1,3 +1,4 @@
+import { CircularProgress } from "@mui/material";
 import { useContext, createContext, useState, useEffect} from "react";
 import io from 'socket.io-client';
 import { serverHost } from "../../constant";
@@ -25,20 +26,25 @@ const SocketContextProvider = ({children}) =>{
                 })
                 
             })
+
+            
         
         }
     }
     useEffect(()=>{
-        setSocket(io('http://localhost:3001'));
+        const socket = io('http://localhost:3001')
+        socket.on("connect", ()=>setSocket(socket))
     }, [])
 
     useEffect(updateSocketID,[socket])
+
+    
 
     const value = {socket, updateSocketID}
 
     return(
         <SocketContext.Provider value={value}>
-            {children}
+            {socket  ? children : <CircularProgress/>}
         </SocketContext.Provider>
     )
 }

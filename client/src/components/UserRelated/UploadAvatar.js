@@ -7,8 +7,7 @@ import Resizer from 'react-image-file-resizer'
 import { useUser } from "../ContextProvider/UserProvider";
 
 
-export const Edit = ({open, setOpen, id}) =>{
-    const newPasswordInput = useRef();
+export const UploadAvatar = ({open, setOpen, id}) =>{
     const [busy, setBusy] = useState(false)
     const [file, setFile] = useState();
     const [user, setUser] = useState({})
@@ -17,8 +16,8 @@ export const Edit = ({open, setOpen, id}) =>{
     const [loading, setLoading] = useState(false);
     const [alertOpen, setAlertOpen] = useState(false);
     const [avatar, setAvatar] = useState();
+    const {updateUser} = useUser();
 
-    const [newPassword, setNewPassword] = useState();
     const handleModalClose = ()=>{
         setOpen(false)
     }
@@ -26,8 +25,8 @@ export const Edit = ({open, setOpen, id}) =>{
         return new Promise((resolve)=>{
             Resizer.imageFileResizer(
                 file,
-                300,
-                300,
+                100,
+                100,
                 "png",
                 100,
                 0,
@@ -40,13 +39,7 @@ export const Edit = ({open, setOpen, id}) =>{
     }
     const update = async()=>{
         setBusy(true)
-        const res = await fetch(`${serverHost}/admin/getUser/${id}`, {
-            method: 'POST',
-            headers:{
-                'Authorization': `Bearer ${localStorage.getItem('jwt')}`
-            },
-        }).then(res=>res.json())
-        const avatar = await fetch(`${serverHost}/admin/getUser/avatar/${id}`, {
+        const avatar = await fetch(`${serverHost}/users/avatar`, {
             method: 'GET',
             headers:{
                 'Authorization': `Bearer ${localStorage.getItem('jwt')}`
@@ -54,7 +47,6 @@ export const Edit = ({open, setOpen, id}) =>{
         }).then(res=>res.blob()).then(res=>URL.createObjectURL(res))
         setAvatar(avatar)
 
-        setUser(res)
         setBusy(false)
     }
 
@@ -69,31 +61,6 @@ export const Edit = ({open, setOpen, id}) =>{
         
     }, [open])
    
-    const handleResetPassword = async ()=>{
-
-        const res = await fetch(`${serverHost}/admin/resetPassword/${id}`, {
-            method: 'POST',
-            headers:{
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('jwt')}`
-            },
-            body: JSON.stringify({
-                password: newPassword
-            })
-        })
-        
-        if(res.ok){
-            setSeverity('success')
-        }
-        else{
-            setSeverity('warning')
-        }
-        const resMessage = await res.json().then(res=>res.message)
-        newPasswordInput.current.value = ""
-        setMessage(resMessage)
-        setAlertOpen(true);
-        setLoading(false);
-    }
     const handleUpload = async()=>{
         console.log('sent')
         setLoading(true);
@@ -102,17 +69,15 @@ export const Edit = ({open, setOpen, id}) =>{
         if(file){
             formData.append('avatar',file)
         }
-        formData.append('userName', user.userName)
-        formData.append('isVerified', user.isVerified)
-        formData.append('_id', user._id)
+
        
-        const res = await fetch(`${serverHost}/admin/update/user`, {
+        const res = await fetch(`${serverHost}/upload/avatar`, {
             method: 'POST',
             headers:{
                 'Authorization': `Bearer ${localStorage.getItem('jwt')}`
             },
             body: formData
-        })
+        }).then(updateUser())
         
         if(res.ok){
             setSeverity('success')
@@ -147,7 +112,7 @@ export const Edit = ({open, setOpen, id}) =>{
             {busy ? <CircularProgress/>:
             <>
             <Typography variant="h4" display="block" gutterBottom >
-                User Profile
+                Upload Avatar
             </Typography>
             
             <Collapse in={alertOpen}>
@@ -175,38 +140,6 @@ export const Edit = ({open, setOpen, id}) =>{
                 <Box sx={Style.formContainer}>
                     
                     <img src={avatar} style= {Style.avatar} alt='avatar'/>
-                    <TextField 
-                        disabled
-                        label="ID"
-                        defaultValue={user._id} 
-                        sx={Style.textField}
-                       />
-                    <TextField 
-                        label="Username"
-                        defaultValue={user.userName} 
-                        sx={Style.textField}
-                        onChange={(e)=>{
-                            setUser(prev=>{
-                                return {...prev, userName:e.target.value}})}}/>
-                    <TextField 
-                        label="Email"
-                        disabled
-                        defaultValue={user.email} 
-                        sx={Style.textField}
-                        onChange={(e)=>{
-                            setUser(prev=>{
-                                return {...prev, email:e.target.value}})}}/>
-                    <Box sx={Style.inputsContainer}>
-                                <Typography>
-                                    IsVerified:
-                                </Typography>
-                    <Checkbox
-                        checked={user.isVerified}
-                        onChange={(e)=>{
-                            
-                            setUser(prev=>{
-                                return {...prev, isVerified:e.target.checked}})}}/>
-                    </Box>
                    
                     <label htmlFor="avatar">
                             <input accept="image/*" style={{display: 'none'}} onChange={handleFileUpload} id="avatar"  type="file" />
@@ -219,22 +152,11 @@ export const Edit = ({open, setOpen, id}) =>{
                     </label>
                     
                        
-                    <Collapse in={!loading}>
+                    <Collapse in={!loading && file}>
                         <Button sx={Style.formItem} variant="outlined" onClick={handleUpload} >Update</Button>
                     </Collapse>
                 </Box>
-                <Box sx={Style.inputsContainer}>
-                        <TextField 
-                        label="New Password"
-                        inputRef={newPasswordInput}
-                        sx={Style.textField}
-                        onChange={(e)=>{
-                            setNewPassword(e.target.value)}}/>
-                            <Collapse in={!loading}>
-                        <Button sx={Style.formItem} disabled={!newPassword} variant="outlined" onClick={handleResetPassword} >Reset Password</Button>
-                    </Collapse>
-                </Box>
-                
+
  
             </>
         }

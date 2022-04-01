@@ -1,4 +1,4 @@
-import { Box, TextField, Button, Fab, Typography } from "@mui/material"
+import { Box, TextField, Button, Fab, Typography, Modal, Card}  from "@mui/material"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useGameContext } from "../ContextProvider/GameContextProvider";
@@ -7,6 +7,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import { serverHost } from "../../constant";
 import { useUser } from "../ContextProvider/UserProvider";
+import { UploadAvatar } from "../UserRelated";
+
 
 export const Lobby = () =>{
     const navigate = useNavigate();
@@ -20,18 +22,13 @@ export const Lobby = () =>{
     const [roomIDInputIsEmpty, setRoomIDInputIsEmpty] = useState(false);
     const [roomNameInputIsEmpty, setRoomNameInputIsEmpty] = useState(false);
 
-    const {setRoomID, setPlayers, setRoomName} = useGameContext();
+   
 
     const {avatar, id, userName} = useUser();
-  
-    const handleEnterRoom = async (roomJSON)=>{
-        const room = JSON.parse(roomJSON);
-        setRoomID(room.ID);
-        setPlayers(room.players);
-        setRoomName(room.name)
-        navigate('/waitingRoom');
-    }
 
+    const [open, setOpen] = useState(false);
+  
+ 
 
     const handleLogout = ()=>{
         localStorage.removeItem('jwt')
@@ -44,7 +41,7 @@ export const Lobby = () =>{
         setRoomNameInputIsEmpty(roomNameInput ? false : true)
         if(userName && roomNameInput){
             socket.emit('createRoom', userName, roomNameInput);
-            socket.on('enterRoom', handleEnterRoom);
+ 
             socket.on('roomIsFull', handleError);
         }
 
@@ -59,12 +56,12 @@ export const Lobby = () =>{
         setRoomIDInputIsEmpty(roomIDInput ? false : true)
         if(userName && roomIDInput){
             socket.emit('joinRoom', userName, roomIDInput);
-            socket.on('enterRoom', handleEnterRoom);
+  
         }
     }
 
     const handlePhoto = () =>{
-
+        setOpen(true)
     }
 
    
@@ -98,7 +95,7 @@ export const Lobby = () =>{
             <Fab color="primary" aria-label="add" sx={Style.photoBtn} onClick={handlePhoto}>
                     <AddPhotoAlternateIcon />
             </Fab>
-            
+            <UploadAvatar open={open} id={id} setOpen={setOpen}/>        
         </Box>
     )
 }
@@ -161,5 +158,6 @@ const Style = {
         pl: 3,
         pr: 6
 
-    }
+    },
+
 }

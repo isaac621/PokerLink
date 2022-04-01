@@ -1,9 +1,10 @@
-import {swap} from './ultility.js'
+import {swap} from '../ultility.js'
 import poker from './poker.js'
 import {PlayerStatus} from './enumeration.js'
 
-function generatePlayer(name, chip = 200, socketID, isHost=false){
+function generatePlayer(id, name, chip = 200, socketID, isHost=false){
     return {
+        id: id,
         name: name,
         chips: chip,
         bet: 0,
@@ -51,10 +52,14 @@ function generateGame(id, roomName, maxNumOfPlayers=8, initialChips=200, minimum
     playerInAction: 0,
     currentPot: 0,
     winner: -1,
-    //template players
 
-    addPlayer: function(name, socketID, isHost=false){
-        this.players.push(generatePlayer(name, this.initialChips, socketID, isHost))
+    started: false,
+    //template players
+    start: function(){
+        this.started = true;
+    },
+    addPlayer: function(userID, name, socketID, isHost=false){
+        this.players.push(generatePlayer(userID, name, this.initialChips, socketID, isHost))
     },
 
     removePlayer: function(socketID){
@@ -374,11 +379,28 @@ function generateGame(id, roomName, maxNumOfPlayers=8, initialChips=200, minimum
     },
 
     sendRoomInfo: function(){
+       
         return JSON.stringify(
             {
                 ID: this.ID,
                 name: this.name,
                 players: this.players
+            }
+        )
+    },
+
+    sendReconnectRoomInfo: function(socketID){
+       
+        return JSON.stringify(
+            {
+                ID: this.ID,
+                name: this.name,
+                players: this.players.map((player)=>{
+                    if(player.socketID != socketID){
+                        player.holeCards = []
+                    }
+                    return player
+                })
             }
         )
     }
