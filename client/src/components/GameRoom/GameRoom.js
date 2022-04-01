@@ -123,7 +123,7 @@ export const GameRoom = () =>{
             raise: false,
             fold: false,
             call: false
-        })
+        }) 
     }
 
     function handleOnClickLeave(){
