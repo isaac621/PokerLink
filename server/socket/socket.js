@@ -15,6 +15,12 @@ export default function socketInit(io, games){
         socket.on('option', handleOption);
         socket.on('gameStart', handleGameStart);
         socket.on('disconnect', handleDisconnect);
+        socket.on('message', handleMessage)
+
+        function handleMessage(name, text, room){
+          console.log('received')
+          socket.to(room).emit("chat", {sender: name, message: text})
+        }
 
         function handleDisconnect(){
             console.log('disconnected')
@@ -41,7 +47,7 @@ export default function socketInit(io, games){
             if(games[roomID].players.length < games[roomID].maxNumOfPlayers){
               socket.join(roomID);
               const user = await User.findOne({socketID: socket.id})
-              console.log(user)
+              
               const userId = user._id;
               user.roomID = roomID;
               user.isGaming = true;
@@ -339,6 +345,7 @@ export default function socketInit(io, games){
         }
       
         async function newHand(roomID){
+          console.log('New')
           clearTimeout(games[roomID].timeOut.id);
           games[roomID].timeOut.id = -1;
           games[roomID].timeOut.socketID =''

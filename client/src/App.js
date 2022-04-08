@@ -7,15 +7,17 @@ import GameContextProvider, { useGameContext } from './components/ContextProvide
 import { useEffect, useState } from 'react';
 import { StatusBar } from './components/GameRoom/StatusBar';
 import { Login, SignUp, Verify, ForgotPassword, ResetPassword, Edit, AdminLogin, AdminEdit} from './components/UserRelated/';
-import AuthProvider, { useAuth } from './components/ContextProvider/AuthProvider';
 import { PrivateRoute } from './PrivateRoute';
 import { VisitorRoute } from './VisitorRoute';
-import UserProvider, { useUser } from './components/ContextProvider/UserProvider';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, TextField } from '@mui/material';
 import { AdminRoute } from './AdminRoute';
 import { serverHost } from './constant';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { loginBg } from './assets/img/background';
+import { blue } from '@mui/material/colors';
 
-
+import '../src/assets/index.css'
+import { height } from '@mui/system';
 
 
 const PlayerStatus = {
@@ -27,6 +29,62 @@ const PlayerStatus = {
   out: 5,
  
 }
+
+
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#78909c',
+      light: '#b0bec5',
+      dark: '#546e7a'
+    },
+    secondary: {
+      main: '#26c6da',
+      light: '#80deea',
+      dark: '#00838f'
+    }
+  },
+  components: {
+    MuiInputBase: {
+        styleOverrides: {
+            input: {
+                color: 'white',
+                
+            },
+              
+        },
+        
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+          root: {
+              color: 'rgba(255, 255, 255, 0.5)',
+          }
+      }
+    },
+
+    MuiOutlinedInput: {
+      styleOverrides: {
+        
+        notchedOutline: {
+          borderColor: 'rgba(255, 255, 255, 0.5)',
+        },
+
+      },
+      
+    },
+    MuiFormLabel:{
+      styleOverrides:{
+        filled:{
+          
+        }
+      }
+    }
+
+
+}
+})
 
 
 function App() {
@@ -81,26 +139,31 @@ function App() {
   return (
 
     <>
-      {!busy ?
-
-      <Routes>
-        <Route exact path='/gameRoom' element={<PrivateRoute><GameRoom/></PrivateRoute>}/>
-        <Route exact path='/waitingRoom' element={<PrivateRoute><WaitingRoom/></PrivateRoute>}/>
-        <Route exact path='/lobby' element={<PrivateRoute><Lobby/></PrivateRoute>}/>
-        <Route exact path='/' element={ <VisitorRoute><Login/></VisitorRoute>}/>
-        <Route exact path='/login' element={<VisitorRoute><Login/></VisitorRoute>}/>
-        <Route exact path='/signUp' element={<VisitorRoute><SignUp/></VisitorRoute>}/>
-        <Route exact path='/verify' element={<Verify/>}/>
-        <Route exact path='/forgot' element={<ForgotPassword/>}/>
-        <Route exact path='/reset' element={<ResetPassword/>}/>
-        <Route exact path='/edit' element={<Edit/>}/>
+      <ThemeProvider theme={theme}>
+      <div style={Style.container}>
+        {!busy ?
         
-        <Route exact path='/admin/login' element = {<VisitorRoute><AdminLogin/></VisitorRoute>}/>
-        <Route exact path='/admin/edit' element={<AdminRoute><AdminEdit/></AdminRoute>}/>
-      </Routes> 
-      :
-      <CircularProgress />
-      }
+          <Routes>
+            <Route exact path='/gameRoom' element={<PrivateRoute><GameRoom/></PrivateRoute>}/>
+            <Route exact path='/waitingRoom' element={<PrivateRoute><WaitingRoom/></PrivateRoute>}/>
+            <Route exact path='/lobby' element={<PrivateRoute><Lobby/></PrivateRoute>}/>
+            <Route exact path='/' element={ <VisitorRoute><Login/></VisitorRoute>}/>
+            <Route exact path='/login' element={<VisitorRoute><Login/></VisitorRoute>}/>
+            <Route exact path='/signUp' element={<VisitorRoute><SignUp/></VisitorRoute>}/>
+            <Route exact path='/verify' element={<Verify/>}/>
+            <Route exact path='/forgot' element={<VisitorRoute><ForgotPassword/></VisitorRoute>}/>
+            <Route exact path='/reset' element={<ResetPassword/>}/>
+            <Route exact path='/edit' element={<Edit/>}/>
+            
+            <Route exact path='/admin/login' element = {<VisitorRoute><AdminLogin/></VisitorRoute>}/>
+            <Route exact path='/admin/edit' element={<AdminRoute><AdminEdit/></AdminRoute>}/>
+          </Routes> 
+       
+        :
+        <CircularProgress />
+        }
+         </div>
+      </ThemeProvider>
               
  
   
@@ -109,3 +172,16 @@ function App() {
 }
 
 export default App;
+
+const Style = {
+  container: {
+    backgroundImage: `url(${loginBg})`,
+    backgroundSize: 'cover',
+    color: 'white',
+    height: '100vh',
+    width: '100vw',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
+}

@@ -15,7 +15,6 @@ import fs from 'fs'
 import mongoose from "mongoose";
 import { db } from "./mongoDB/connection.js";
 
-
 const storage = multer.memoryStorage()
 
 const upload = multer({storage: storage})
@@ -27,7 +26,6 @@ const io = new Server(httpServer, {
     origin: "*",
   }
 })
-
 
 const games = {};
 
@@ -120,7 +118,6 @@ app.post('/update/socketID', authenticateToken , async(req, res)=>{
 })
 
 app.post('/game/gameInfo', authenticateToken, (req, res)=>{
-  console.log(req.body)
   if(req.user.roomID){
     games[req.user.roomID].players = games[req.user.roomID].players.map((player)=>{
       
@@ -145,7 +142,7 @@ app.post('/login', async (req, res)=>{
   const {userName, password} = req.body
   const user = await User.findOne({userName: userName})
   if(user==null){
-    res.status(400).send('Cannot find user')
+    res.status(400).json({message: 'Cannot find user'})
   }
   try{
     if(await bcrypt.compare(password, user.password)){
@@ -153,10 +150,10 @@ app.post('/login', async (req, res)=>{
         id: user.id
       }
       const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
-      res.json({accessToken: accessToken})
+      res.json({accessToken: accessToken, message: 'Login Successfully'})
     }
     else{
-      res.send('wrong password')
+      res.status(403).json({message: 'wrong password'})
     }
   }
   catch{

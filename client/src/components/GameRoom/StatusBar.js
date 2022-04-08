@@ -2,7 +2,7 @@ import { Typography, Box, CircularProgress } from '@mui/material';
 import profilePic from '../../assets/img/profilePic.png'
 import PokerCard from './PokerCard';
 import { PlayerStatus } from '../../assets/utils/enumeration';
-import { teal } from '@mui/material/colors';
+import { amber, red, teal } from '@mui/material/colors';
 import dealerBtn from '../../assets/img/dealerBtn.png'
 import { useSpring, animated } from 'react-spring'
 
@@ -77,7 +77,7 @@ export const StatusBar = ({player, pos, dealer, inAction, img}) =>{
     }
     return(
         <Box sx={{...Style.container, opacity: player.status == PlayerStatus.out && '40%'}}>
-            <Box sx={{...Style.pillContainer, bgcolor: player.status == PlayerStatus.allin ?'red': 'primary.dark',}}>
+            <Box sx={{...Style.pillContainer, bgcolor: player.status == PlayerStatus.allin ? red[900]: 'primary.dark',}}>
                 <ProfilePic inAction={inAction} img={img}/>
                 <Box sx={Style.InfosContainer}>
                     <Box sx={{...Style.fontContainer, ...Style.nameContainer}}>
@@ -154,7 +154,7 @@ const Style = {
         display: 'flex',
         flexDirection: 'row',
         position: 'relative',
-        color: teal[200],
+        color: amber[300],
         zIndex: 3,
         transform: 'translateX(12.5px)'
 

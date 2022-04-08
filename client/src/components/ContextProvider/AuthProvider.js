@@ -43,13 +43,6 @@ const AuthProvider = ({children})=>{
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
-        }).then(res=>{
-            if(res.ok){
-                return res.json()
-            }
-            else{
-                return
-            }
         }).catch(err=>console.log(err))
         return response
     }

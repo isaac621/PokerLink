@@ -55,12 +55,19 @@ export const WaitingRoom = () =>{
                                                 <Avatar alt="Remy Sharp" src={profilePic} />
                                             </ListItemAvatar>
                                             <ListItemText
-                                            primary={player.name}
+                                            primary={<Typography
+                                              
+                                                variant="h6"
+                                                color="secondary.dark"
+                                            >
+                            
+                                                {player.name}
+                                            </Typography>}
                                             secondary={
                                                 <Typography
                                                     sx={{ display: 'inline' }}
                                                     component="span"
-                                                    variant="body2"
+                                                    variant="caption"
                                                     color="text.primary"
                                                 >
                                 
@@ -100,7 +107,6 @@ export const WaitingRoom = () =>{
 
 const Style = {
     container: {
-        backgroundColor: 'white',
         height: '100vh',
         width: '100vw',
         display: 'flex',
@@ -113,13 +119,15 @@ const Style = {
         minHeight: 350, 
         maxWidth: 600, 
         backgroundColor: 'grey.200',
-        p: 0
+        p: 0,
+        
     },
     listItem: {
         py: 0,
         height: 60
     },
     roomIdContainer: {
+        color: 'black',
         backgroundColor: 'grey.200',
         display: 'flex',
         flexDirection: 'column',

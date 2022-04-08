@@ -1,15 +1,60 @@
-import { Box, Container, Button, TextField } from '@mui/material';
+import { Box, Container, Button, TextField, Typography } from '@mui/material';
+import { red } from '@mui/material/colors';
+import { useEffect, useRef, useState } from 'react';
+import { useGameContext } from '../ContextProvider/GameContextProvider';
+import { useSocket } from '../ContextProvider/SocketContextProvider';
+import { useUser } from '../ContextProvider/UserProvider';
 
 
 export const ChatBox = () =>{
+    const {socket} = useSocket()
+    const {userName} = useUser()
+    const {roomID} = useGameContext();
+    const [chat, setChat] = useState([])
+    const [message, setMessage] = useState()
+    const chatLogRef = useRef(null);
+
+    const handleMessage = (e)=>{
+        setMessage(e.target.value)
+    }
+
+    const handleSent = ()=>{
+        setChat((prev)=>{
+            return  [...prev, {sender: 'You', message: message, you: true}]
+        })
+        chatLogRef.current.scrollIntoView()
+        socket.emit('message', userName, message, roomID)
+        
+    }
+    const handleChat =(e)=>{
+        setChat((prev)=>{
+            return  [...prev, e]
+        })
+        console.log(chatLogRef)
+        chatLogRef.current.scrollIntoView()
+
+    }
+
+    useEffect(()=>{
+        socket.on('chat', handleChat)
+    }, [])
+
     return (
         <Box sx={Style.container}>
             <Box sx={Style.chatLog}>
-
+                {chat.map((e,i)=>{
+                    return <Box
+                        key={i}
+                        sx={e.you ? {...Style.chat, ...Style.chat_y} : Style.chat}
+                        >
+                        [{e.sender}]: {e.message}
+                    </Box>
+                })}
+                <div style ={{...Style.chat, height: 10}} ref={chatLogRef}/>
             </Box>
             <Box sx={Style.chatInputContainer}>
-                <TextField sx={Style.chatInput} id="filled-basic" label="Filled" variant="filled" size="small"/>
-                <Button sx={Style.chatInputBtn} variant="contained">
+                <TextField sx={Style.chatInput} id="filled-basic" label="Put your chat here" variant="filled" size="small" onChange={handleMessage}/>
+                <Button sx={Style.chatInputBtn} variant="contained" onClick={handleSent}>
                     Send
                 </Button>
             </Box>
@@ -27,12 +72,26 @@ const Style = {
         m: 0,
         p: 1,
     },
+    chat:{
+        color: 'black',
+        fontSize: '1.1rem',
+        display: 'flex',
+        width: '100%',
+        wordBreak: 'break-all'
+    },
+    chat_y:{
+        color: red[900],
+    },
     chatLog: {
+        boxSizing: 'border-box',
         backgroundColor: 'lightGrey',
         height: 180,
         width: 350,
         my: 1,
         borderRadius: 5,
+        px: 1,
+        py: 2,
+        overflowY: 'scroll'
     },
     chatInputContainer: {
         height: 50,

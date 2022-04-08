@@ -142,7 +142,7 @@ const Style = {
         border: '2px solid',
         borderRadius: 30,
         borderColor: 'primary.dark',
-        bgcolor: 'primary.light'
+        background: 'linear-gradient(90deg, rgba(2,0,36,0) 0%, rgba(0,0,0,0.5189426112241772) 12%, rgba(0,0,0,0.9643207624846813) 30%, rgba(0,212,255,1) 100%)'
     },
     avatar: {
         width: 80,

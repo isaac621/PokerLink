@@ -109,6 +109,7 @@ const Style = {
     formContainer: {
         display: 'flex',
         flexDirection: 'column',
+        width: 250
     },
     formItem: {
         my: 1

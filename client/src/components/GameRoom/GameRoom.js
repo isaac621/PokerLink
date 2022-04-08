@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { EndingScreen } from './EndingScreen';
 import { useUser } from '../ContextProvider/UserProvider';
 import { serverHost } from '../../constant';
+import { brown } from '@mui/material/colors';
 
 
 export const GameRoom = () =>{
@@ -188,8 +189,8 @@ const Style = {
     table: {
         position: 'absolute',
         borderRadius: 1000,
-        borderColor: 'grey.500',
         border: '20px solid',
+        borderColor: brown[800],
         width: 980,
         height: 450,
         backgroundColor: 'green',
@@ -206,8 +207,8 @@ const Style = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        //backgroundImage: `url(${gameRoomBg})`,
-        backgroundSize: 'cover',
+        backgroundImage: `url(${gameRoomBg})`,
+        backgroundSize: 1000,
         
         zIndex: 0
     },
