@@ -75,7 +75,7 @@ export default function socketInit(io, games){
       
           }
           else{
-            games[roomID].removePlayer(socket.id);
+            games[roomID].removePlayer(socket.id);  
       
           }
           const user = await User.findOne({socketID: socket.id})
@@ -386,6 +386,7 @@ export default function socketInit(io, games){
 
               }
             update()
+            io.to(roomID).emit("chat", {sender: 'GAME', message: 'Game Has Ended, you can leave the room now', isGM: true})
             io.in(roomID).socketsLeave(roomID)
 
             return;

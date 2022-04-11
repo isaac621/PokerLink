@@ -8,7 +8,7 @@ export const EndingScreen = ({winner}) =>{
             <Box sx={Style.bg}>
 
             </Box>
-            <Typography variant='h1'sx={Style.typo}>
+            <Typography variant='h1' sx={Style.typo}>
                 {winner} wins the game!
             </Typography>
         </Box>

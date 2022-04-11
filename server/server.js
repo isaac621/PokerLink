@@ -150,7 +150,12 @@ app.post('/login', async (req, res)=>{
         id: user.id
       }
       const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
-      res.json({accessToken: accessToken, message: 'Login Successfully'})
+      if(user.isVerified){
+        res.json({accessToken: accessToken, message: 'Login Successfully'})
+      }
+      else{
+        res.status(403).json({message: 'User has not been verified'})
+      }
     }
     else{
       res.status(403).json({message: 'wrong password'})

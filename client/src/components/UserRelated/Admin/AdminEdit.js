@@ -1,6 +1,6 @@
-import { Box, TextField, Button, Typography, Fab } from "@mui/material"
-import { useContext, useEffect, useState } from "react"
-import { Link, useNavigate,  } from "react-router-dom";
+import { Box, TextField,  Typography, Fab } from "@mui/material"
+import { useEffect, useState } from "react"
+import { useNavigate,  } from "react-router-dom";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { AdminSearch } from "./AdminSearch";
 import { serverHost } from "../../../constant";
@@ -59,7 +59,7 @@ export const AdminEdit = () =>{
                     Admin Edit
                 </Typography>
                 <Box sx={Style.formContainer}>
-                    <TextField sx={Style.formItem}label="Username" onChange={handleUserNameOnChange} type="password"/>
+                    <TextField sx={Style.formItem}label="Username" onChange={handleUserNameOnChange} />
                 </Box>
             </Box>
             <AdminSearch users={users} handleUserOnClick={handleUserOnClick}/>
@@ -67,7 +67,7 @@ export const AdminEdit = () =>{
             <Fab color="secondary" aria-label="add" sx={Style.logoutBtn} onClick={handleLogout}>
                     <LogoutIcon />
             </Fab>
-            <Edit id={id} open={open} setOpen={setOpen}/>   
+            <Edit id={id} open={open} setOpen={setOpen} search={()=>search({'userName': {$regex: userName || '', $options: 'i'}})}/>   
         </Box>
     )
 }

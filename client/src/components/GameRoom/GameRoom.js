@@ -1,4 +1,4 @@
-import { Box, Container, Button, Slider, Fab } from '@mui/material';
+import { Box, Container,  Fab } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { StatusBar } from './StatusBar';
 import { TableCenter } from './TableCenter';
@@ -13,7 +13,6 @@ import { PlayerStatus } from '../../assets/utils/enumeration';
 import { useNavigate } from "react-router-dom";
 
 import { EndingScreen } from './EndingScreen';
-import { useUser } from '../ContextProvider/UserProvider';
 import { serverHost } from '../../constant';
 import { brown } from '@mui/material/colors';
 
@@ -40,7 +39,8 @@ export const GameRoom = () =>{
     const [winner, setWinner] = useState('');
     
 
-    useEffect(async()=>{
+    useEffect(()=>{
+        (async()=>{
         socket.on('updateDealer', (dealerPos)=>setDealerPos(dealerPos))
         socket.on('updatePlayerHoleCards', handleUpdatePlayerHoleCards);
         socket.on('updatePlayersInfo', handleUpdatePlayersInfo)
@@ -62,7 +62,7 @@ export const GameRoom = () =>{
             avatars.push(avatar)
         })
         console.log(avatars, 111)
-        setPlayersAvatar(avatars)
+        setPlayersAvatar(avatars)})()
     }, [])
 
     function handleGameEnd(name){
@@ -209,7 +209,7 @@ const Style = {
         alignItems: 'center',
         backgroundImage: `url(${gameRoomBg})`,
         backgroundSize: 1000,
-        
+        minWidth: '1090px',
         zIndex: 0
     },
     mainTable: {

@@ -1,4 +1,4 @@
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper} from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper} from '@mui/material';
 import { useGameContext } from '../ContextProvider/GameContextProvider';
 
 export const GameInfo = ()=>{

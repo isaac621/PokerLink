@@ -1,11 +1,9 @@
-import { Box, TextField, Button, Fab, Typography, Modal, Card}  from "@mui/material"
-import { useEffect, useState } from "react"
+import { Box, TextField, Button, Fab, Typography}  from "@mui/material"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom";
-import { useGameContext } from "../ContextProvider/GameContextProvider";
 import { useSocket } from "../ContextProvider/SocketContextProvider";
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import { serverHost } from "../../constant";
 import { useUser } from "../ContextProvider/UserProvider";
 import { UploadAvatar } from "../UserRelated";
 
@@ -40,6 +38,7 @@ export const Lobby = () =>{
         setUserNameIsEmpty(userName ? false : true)
         setRoomNameInputIsEmpty(roomNameInput ? false : true)
         if(userName && roomNameInput){
+            console.log(1)
             socket.emit('createRoom', userName, roomNameInput);
  
             socket.on('roomIsFull', handleError);
@@ -86,8 +85,8 @@ export const Lobby = () =>{
             <Box sx={Style.formContainer}>
                 <TextField sx={Style.formItem} error={roomNameInputIsEmpty} label="RoomName" onChange={(e)=>{setRoomNameInput(e.target.value)}}/>
                 <TextField sx={Style.formItem} error={roomIDInputIsEmpty} label="RoomID" onChange={(e)=>{setRoomIDInput(e.target.value)}}/>
-                <Button sx={Style.formItem} variant="outlined" onClick={handleCreateRoom}>Create</Button>
-                <Button sx={Style.formItem} variant="outlined" onClick={handleJoinRoom}>Join</Button>
+                <Button sx={Style.formItem} color='secondary' variant="outlined" onClick={handleCreateRoom}>Create</Button>
+                <Button sx={Style.formItem} color='secondary' variant="outlined" onClick={handleJoinRoom}>Join</Button>
             </Box>
             <Fab color="secondary" aria-label="add" sx={Style.logoutBtn} onClick={handleLogout}>
                     <LogoutIcon />

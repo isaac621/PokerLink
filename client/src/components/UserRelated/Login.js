@@ -1,6 +1,5 @@
 import { Box, TextField, Button, Typography, Collapse, Alert, IconButton } from "@mui/material"
-import { blue } from "@mui/material/colors";
-import { useContext, useEffect, useState } from "react"
+import { useState } from "react"
 import { Link, useNavigate,  } from "react-router-dom";
 import { useAuth } from "../ContextProvider/AuthProvider";
 import { useUser } from "../ContextProvider/UserProvider";
@@ -39,6 +38,7 @@ export const Login = () =>{
         setMessage(message)
         setOpen(true);
         if(accessToken){
+            console.log(accessToken)
             localStorage.setItem('jwt', accessToken)
             updateUser().then( navigate('/lobby', {replace: true}))
         }
@@ -77,7 +77,7 @@ export const Login = () =>{
                 <TextField sx={Style.formItem} error={userNameIsEmpty} required label="Username" onChange={(e)=>{setUserName(e.target.value)}}/>
                 <TextField sx={Style.formItem} error={passwordIsEmpty} label="Password" onChange={(e)=>{setPassword(e.target.value)}}/>
 
-                <Button sx={Style.formItem} disabled={busy} variant="outlined" onClick={handleLogin} >Login</Button>
+                <Button sx={Style.formItem} disabled={busy} variant="outlined" onClick={handleLogin} color='secondary' >Login</Button>
             </Box>
             <Typography sx={Style.caption} variant="caption" display="block" >
                 Not registered? <Link to='/signUp'>Create an account</Link> | <Link to='/forgot'>Forgot Password</Link>

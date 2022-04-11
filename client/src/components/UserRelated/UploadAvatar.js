@@ -1,6 +1,6 @@
-import { Box, Card, Button, Typography, Alert, IconButton, Collapse,  Modal, TextField, CircularProgress, Checkbox} from "@mui/material"
-import { useContext, useEffect, useRef, useState } from "react"
-import { Link, useNavigate,  } from "react-router-dom";
+import { Box, Card, Button, Typography, Alert, IconButton, Collapse,  Modal,  CircularProgress} from "@mui/material"
+import {useEffect, useState } from "react"
+
 import { serverHost } from "../../constant";
 import CloseIcon from '@mui/icons-material/Close';
 import Resizer from 'react-image-file-resizer'
@@ -20,7 +20,12 @@ export const UploadAvatar = ({open, setOpen, id}) =>{
 
     const handleModalClose = ()=>{
         setOpen(false)
+        setFile()
+        setSeverity()
+        setMessage()
+        setAlertOpen(false)
     }
+
     const resizeFile = (file) =>{
         return new Promise((resolve)=>{
             Resizer.imageFileResizer(
@@ -50,16 +55,13 @@ export const UploadAvatar = ({open, setOpen, id}) =>{
         setBusy(false)
     }
 
-    useEffect(async()=>{
-        setFile()
-        setSeverity()
-        setMessage()
-        setAlertOpen()
+    useEffect(()=>{
+        
         if(id){
             update()
         }
         
-    }, [open])
+    }, [open, id])
    
     const handleUpload = async()=>{
         console.log('sent')

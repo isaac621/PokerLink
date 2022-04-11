@@ -1,13 +1,13 @@
 import { Box, Card, Button, Typography, Alert, IconButton, Collapse,  Modal, TextField, CircularProgress, Checkbox} from "@mui/material"
-import { useContext, useEffect, useRef, useState } from "react"
-import { Link, useNavigate,  } from "react-router-dom";
+import { useEffect, useRef, useState } from "react"
 import { serverHost } from "../../constant";
 import CloseIcon from '@mui/icons-material/Close';
 import Resizer from 'react-image-file-resizer'
-import { useUser } from "../ContextProvider/UserProvider";
+import { grey } from "@mui/material/colors";
 
 
-export const Edit = ({open, setOpen, id}) =>{
+
+export const Edit = ({open, setOpen, id, search}) =>{
     const newPasswordInput = useRef();
     const [busy, setBusy] = useState(false)
     const [file, setFile] = useState();
@@ -125,6 +125,7 @@ export const Edit = ({open, setOpen, id}) =>{
         setAlertOpen(true);
         setLoading(false);
         setFile()
+        search()
         update()
     }
 
@@ -181,13 +182,15 @@ export const Edit = ({open, setOpen, id}) =>{
                         defaultValue={user._id} 
                         sx={Style.textField}
                        />
-                    <TextField 
-                        label="Username"
-                        defaultValue={user.userName} 
-                        sx={Style.textField}
-                        onChange={(e)=>{
-                            setUser(prev=>{
-                                return {...prev, userName:e.target.value}})}}/>
+                    <Box sx={{bgcolor: grey[800], py: 1, px:1, borderRaidus: 1}}>       
+                        <TextField 
+                            label="Username"
+                            defaultValue={user.userName} 
+                            sx={Style.textField}
+                            onChange={(e)=>{
+                                setUser(prev=>{
+                                    return {...prev, userName:e.target.value}})}}/>
+                    </Box>
                     <TextField 
                         label="Email"
                         disabled
@@ -220,10 +223,11 @@ export const Edit = ({open, setOpen, id}) =>{
                     
                        
                     <Collapse in={!loading}>
-                        <Button sx={Style.formItem} variant="outlined" onClick={handleUpload} >Update</Button>
+                        <Button sx={Style.formItem} variant="outlined" onClick={handleUpload} color='secondary'>Update</Button>
                     </Collapse>
                 </Box>
-                <Box sx={Style.inputsContainer}>
+            
+                <Box sx={{...Style.inputsContainer, bgcolor: grey[800]}}>
                         <TextField 
                         label="New Password"
                         inputRef={newPasswordInput}
@@ -231,7 +235,7 @@ export const Edit = ({open, setOpen, id}) =>{
                         onChange={(e)=>{
                             setNewPassword(e.target.value)}}/>
                             <Collapse in={!loading}>
-                        <Button sx={Style.formItem} disabled={!newPassword} variant="outlined" onClick={handleResetPassword} >Reset Password</Button>
+                        <Button sx={Style.formItem} disabled={!newPassword} color='secondary' variant="outlined" onClick={handleResetPassword} >Reset Password</Button>
                     </Collapse>
                 </Box>
                 
@@ -275,7 +279,8 @@ const Style = {
     },
     textField:{
         my: 1,
-        width: 300
+        width: 300,
+        color: 'black'
     },
     avatar: {
         width: 100,
@@ -286,6 +291,8 @@ const Style = {
     },
     inputsContainer:{
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
+        px: 1,
+        borderRadius: 1,
     },
 }

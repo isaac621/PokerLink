@@ -84,7 +84,7 @@ export const AdminLogin = () =>{
             <Box sx={Style.formContainer}>
                 <TextField sx={Style.formItem} error={userNameIsEmpty} required label="Username" onChange={(e)=>{setUserName(e.target.value)}}/>
                 <TextField sx={Style.formItem} error={passwordIsEmpty} label="Password" onChange={(e)=>{setPassword(e.target.value)}}/>
-                <Button sx={Style.formItem} variant="outlined" onClick={handleLogin} disabled={loading || !userName || !password} >Login</Button>
+                <Button sx={Style.formItem} variant="outlined" onClick={handleLogin} disabled={loading || !userName || !password} color='secondary'>Login</Button>
             </Box>
             <Link to='/login' style={Style.link}>
                     <Button variant="contained" >

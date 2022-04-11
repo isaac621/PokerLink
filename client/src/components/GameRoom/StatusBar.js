@@ -1,10 +1,10 @@
 import { Typography, Box, CircularProgress } from '@mui/material';
-import profilePic from '../../assets/img/profilePic.png'
 import PokerCard from './PokerCard';
 import { PlayerStatus } from '../../assets/utils/enumeration';
-import { amber, red, teal } from '@mui/material/colors';
+import { amber, red } from '@mui/material/colors';
 import dealerBtn from '../../assets/img/dealerBtn.png'
 import { useSpring, animated } from 'react-spring'
+import { useSocket } from '../ContextProvider/SocketContextProvider';
 
 const ProfilePic = ({inAction, img})=>{
     const blinkBorder = useSpring({
@@ -38,7 +38,7 @@ const ProfilePic = ({inAction, img})=>{
 
 export const StatusBar = ({player, pos, dealer, inAction, img}) =>{
     
-
+    const {socket} = useSocket();
     function determineBetDisplayPos(pos){
         switch(pos){
             case 0:
@@ -81,7 +81,7 @@ export const StatusBar = ({player, pos, dealer, inAction, img}) =>{
                 <ProfilePic inAction={inAction} img={img}/>
                 <Box sx={Style.InfosContainer}>
                     <Box sx={{...Style.fontContainer, ...Style.nameContainer}}>
-                        <Typography>
+                        <Typography sx={player.socketID == socket.id ? {color: 'secondary.main', fontWeight: 900} : {}}>
                             {player.name}
                         </Typography>
                     </Box>

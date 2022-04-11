@@ -1,5 +1,5 @@
 import { Box, Container, Button, TextField, Typography } from '@mui/material';
-import { red } from '@mui/material/colors';
+import { green, red } from '@mui/material/colors';
 import { useEffect, useRef, useState } from 'react';
 import { useGameContext } from '../ContextProvider/GameContextProvider';
 import { useSocket } from '../ContextProvider/SocketContextProvider';
@@ -13,20 +13,27 @@ export const ChatBox = () =>{
     const [chat, setChat] = useState([])
     const [message, setMessage] = useState()
     const chatLogRef = useRef(null);
+    const inputRef = useRef(null);
 
     const handleMessage = (e)=>{
         setMessage(e.target.value)
     }
 
     const handleSent = ()=>{
-        setChat((prev)=>{
-            return  [...prev, {sender: 'You', message: message, you: true}]
-        })
-        chatLogRef.current.scrollIntoView()
-        socket.emit('message', userName, message, roomID)
+        if(message){
+            setChat((prev)=>{
+                return  [...prev, {sender: 'You', message: message, you: true}]
+            })
+            chatLogRef.current.scrollIntoView()
+            console.log(inputRef)
+            inputRef.current.value = ''
+            setMessage('')
+            socket.emit('message', userName, message, roomID)
+        }
         
     }
     const handleChat =(e)=>{
+        console.log(socket.id)
         setChat((prev)=>{
             return  [...prev, e]
         })
@@ -45,7 +52,7 @@ export const ChatBox = () =>{
                 {chat.map((e,i)=>{
                     return <Box
                         key={i}
-                        sx={e.you ? {...Style.chat, ...Style.chat_y} : Style.chat}
+                        sx={e.you ? {...Style.chat, ...Style.chat_y} : (e.isGM ? {...Style.chat, ...Style.chat_GM}: Style.chat)}
                         >
                         [{e.sender}]: {e.message}
                     </Box>
@@ -53,7 +60,7 @@ export const ChatBox = () =>{
                 <div style ={{...Style.chat, height: 10}} ref={chatLogRef}/>
             </Box>
             <Box sx={Style.chatInputContainer}>
-                <TextField sx={Style.chatInput} id="filled-basic" label="Put your chat here" variant="filled" size="small" onChange={handleMessage}/>
+                <TextField sx={Style.chatInput} id="filled-basic" label="Put your chat here" variant="filled" size="small" onChange={handleMessage} inputRef={inputRef}/>
                 <Button sx={Style.chatInputBtn} variant="contained" onClick={handleSent}>
                     Send
                 </Button>
@@ -81,6 +88,9 @@ const Style = {
     },
     chat_y:{
         color: red[900],
+    },
+    chat_GM:{
+        color: green['A700'],
     },
     chatLog: {
         boxSizing: 'border-box',

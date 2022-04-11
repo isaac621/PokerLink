@@ -1,6 +1,6 @@
 import { Box, TextField, Button, Typography, Alert, IconButton, Collapse,  } from "@mui/material"
-import { useContext, useEffect, useState } from "react"
-import { Link, useNavigate,  } from "react-router-dom";
+import { useState } from "react"
+import { useNavigate,  } from "react-router-dom";
 import { serverHost } from "../../constant";
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -77,7 +77,7 @@ export const ResetPassword = () =>{
                 <Box sx={Style.formContainer}>
                     <TextField sx={Style.formItem} required label="ForgotCode" onChange={(e)=>{setForgotCode(e.target.value)}} type="password"/>
                     <TextField sx={Style.formItem} required label="New Password" onChange={(e)=>{setNewPassword(e.target.value)}} type="password"/>
-                    <Button sx={Style.formItem} variant="outlined" onClick={handleReset} disabled={loading || !forgotCode || !newPassword}>Reset</Button>
+                    <Button sx={Style.formItem} variant="outlined" onClick={handleReset} disabled={loading || !forgotCode || !newPassword} color='secondary'>Reset</Button>
                 </Box>
                 
             </Collapse>

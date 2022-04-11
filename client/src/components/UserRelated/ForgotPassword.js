@@ -67,7 +67,7 @@ export const ForgotPassword = () =>{
             <Collapse in={severity != 'success'}>
                 <Box sx={Style.formContainer}>
                     <TextField sx={Style.formItem} required label="Username" onChange={(e)=>{setUserName(e.target.value)}} type="password"/>
-                    <Button sx={Style.formItem} variant="outlined" onClick={handleReset} disabled={loading || !userName}>Reset</Button>
+                    <Button sx={Style.formItem} variant="outlined" onClick={handleReset} disabled={loading || !userName} color='secondary'>Reset</Button>
                 </Box>
                 
             </Collapse>

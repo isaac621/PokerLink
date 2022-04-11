@@ -3,15 +3,15 @@ import profilePic from '../../assets/img/profilePic.png'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useGameContext } from "../ContextProvider/GameContextProvider";
 import { useSocket } from "../ContextProvider/SocketContextProvider";
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import StarRateIcon from '@mui/icons-material/StarRate';
-import { serverHost } from '../../constant';
+
 
 export const WaitingRoom = () =>{
     const navigate = useNavigate();
     const {socket} = useSocket();
-    const {players, setPlayers, roomID, setRoomID, roomName, setRoomName} = useGameContext();
+    const {players, roomID, setRoomID, roomName} = useGameContext();
     
     const [busy, setBusy] = useState(false);
 

@@ -1,6 +1,6 @@
 import { Box, TextField, Button, Typography } from "@mui/material"
-import { useContext, useEffect, useState } from "react"
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react"
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../ContextProvider/AuthProvider";
 
 
@@ -68,9 +68,10 @@ export const SignUp = () =>{
         }
     }, [email])
 
-    useEffect(async ()=>{    
+    useEffect(()=>{
+        (async ()=>{    
         await handleValidation('userName', userName, setUserNameError, setUserNameHelperText)
-       
+       })()
     }, [userName])
 
     
@@ -88,7 +89,7 @@ export const SignUp = () =>{
                 <TextField sx={Style.formItem} error={userNameError} required label="Username" onChange={(e)=>{setUserName(e.target.value)}} helperText={userNameHelperText}/>
                 <TextField sx={Style.formItem} error={emailError} required label="Email" onChange={(e)=>setEmail(e.target.value)} helperText={emailHelperText}/>
                 <TextField sx={Style.formItem} error={passwordError} label="Password" onChange={(e)=>{setPassword(e.target.value)}}/>
-                <Button sx={Style.formItem} variant="outlined" onClick={handleSignUp} disabled={validSubmission}>Create an Account</Button>
+                <Button sx={Style.formItem} variant="outlined" color='secondary' onClick={handleSignUp} disabled={validSubmission}>Create an Account</Button>
             </Box>
             <Typography variant="caption" display="block" >
                 Already have an account? <Link to='/Login'>Login</Link>
