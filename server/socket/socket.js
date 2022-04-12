@@ -57,12 +57,12 @@ export default function socketInit(io, games){
               io.to(roomID).emit('enterRoom', games[roomID].sendRoomInfo())
             }
             else{
-              socket.emit('rejectJoinRoom', 'roomIsFull');
+              socket.emit('rejectJoinRoom', 'Room is full');
               console.log('roomIsFull')
             }
           }
           else{
-            socket.emit('rejectJoinRoom', 'invalidRoomID');
+            socket.emit('rejectJoinRoom', 'Invalid RoomID');
           }
         }
       

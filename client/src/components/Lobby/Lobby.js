@@ -1,12 +1,12 @@
-import { Box, TextField, Button, Fab, Typography}  from "@mui/material"
-import { useState } from "react"
+import { Box, TextField, Button, Fab, Typography, Collapse, IconButton, Alert}  from "@mui/material"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import { useSocket } from "../ContextProvider/SocketContextProvider";
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import { useUser } from "../ContextProvider/UserProvider";
 import { UploadAvatar } from "../UserRelated";
-
+import CloseIcon from '@mui/icons-material/Close';
 
 export const Lobby = () =>{
     const navigate = useNavigate();
@@ -19,7 +19,8 @@ export const Lobby = () =>{
     const [userNameIsEmpty, setUserNameIsEmpty] = useState(false);
     const [roomIDInputIsEmpty, setRoomIDInputIsEmpty] = useState(false);
     const [roomNameInputIsEmpty, setRoomNameInputIsEmpty] = useState(false);
-
+    const [alertOpen, setAlertOpen] = useState(false)
+    const [message, setMessage] = useState('')
    
 
     const {avatar, id, userName} = useUser();
@@ -33,6 +34,12 @@ export const Lobby = () =>{
         navigate('/login')
     }
     
+    useEffect(()=>{
+        socket.on('rejectJoinRoom', (message)=>{
+            setAlertOpen(true)
+            setMessage(message)
+        })
+    }, [])
     
     const handleCreateRoom = () =>{
         setUserNameIsEmpty(userName ? false : true)
@@ -40,8 +47,7 @@ export const Lobby = () =>{
         if(userName && roomNameInput){
             console.log(1)
             socket.emit('createRoom', userName, roomNameInput);
- 
-            socket.on('roomIsFull', handleError);
+
         }
 
     }
@@ -83,6 +89,26 @@ export const Lobby = () =>{
                 </Box>
             </Box>
             <Box sx={Style.formContainer}>
+                <Collapse in={alertOpen}>
+                <Alert
+                        severity='warning'
+                        action={
+                            <IconButton
+                            aria-label="close"
+                            color="inherit"
+                            size="small"
+                            onClick={() => {
+                                setAlertOpen(false);
+                            }}
+                            >
+                                <CloseIcon fontSize="inherit" />
+                            </IconButton>
+                        }
+                        sx={{ mb: 2 }}
+                    >
+                        {message}
+                    </Alert>
+                </Collapse>
                 <TextField sx={Style.formItem} error={roomNameInputIsEmpty} label="RoomName" onChange={(e)=>{setRoomNameInput(e.target.value)}}/>
                 <TextField sx={Style.formItem} error={roomIDInputIsEmpty} label="RoomID" onChange={(e)=>{setRoomIDInput(e.target.value)}}/>
                 <Button sx={Style.formItem} color='secondary' variant="outlined" onClick={handleCreateRoom}>Create</Button>
