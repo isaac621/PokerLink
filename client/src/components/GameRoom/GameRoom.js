@@ -37,7 +37,7 @@ export const GameRoom = () =>{
 
     const [gameEnd, setGameEnd] =useState(false);
     const [winner, setWinner] = useState('');
-    
+    const [timeBarIn, setTimeBarIn] = useState(false)
 
     useEffect(()=>{
         (async()=>{
@@ -50,7 +50,8 @@ export const GameRoom = () =>{
         socket.on('updatePot', handleUpdatePot)
         socket.on('updateSb', (sb)=>setSb(sb))
         socket.on('gameEnd', handleGameEnd)
-        const avatars = [];
+        
+        const avatars = []
 
         players.map(async(player)=>{
             const avatar = await fetch(`${serverHost}/users/avatar/${player.id}`, {
@@ -58,11 +59,24 @@ export const GameRoom = () =>{
                 headers:{
                     'Authorization': `Bearer ${localStorage.getItem('jwt')}`
                 },
-            }).then(res=>res.blob()).then(res=>URL.createObjectURL(res)).catch(err=>console.log(err))
-            avatars.push(avatar)
+            }).then(res=>res.blob()).then(res=>URL.createObjectURL(res)).then(avatar=>avatars.push(avatar)).catch(err=>console.log(err))
         })
-        console.log(avatars, 111)
+        
+        console.log(avatars)
         setPlayersAvatar(avatars)})()
+
+
+        return(()=>{
+            socket.off('updateDealer')
+            socket.off('updatePlayerHoleCards');
+            socket.off('updatePlayersInfo')
+            socket.off('updateCommunityCards')
+            socket.off('requestOption')
+            socket.off('optionReceived')
+            socket.off('updatePot')
+            socket.off('updateSb')
+            socket.off('gameEnd')
+        })
     }, [])
 
     function handleGameEnd(name){
@@ -116,6 +130,10 @@ export const GameRoom = () =>{
         if(socketID == socket.id){
             setOptions(playerOptions);
         }
+        if(!timeBarIn){
+            setTimeBarIn(true)
+        }
+        
     }
 
     function handleOptionReceived(){
@@ -154,7 +172,8 @@ export const GameRoom = () =>{
                     {players.map((player, index)=>{
                         return(
                             <Box key={index} sx={{gridArea: `p${index}`,...Style.statusBarContainer}}>
-                                <StatusBar player={player} pos={index} dealer={dealerPos == index} inAction={playerInAction==index} img={playersAvatar && playersAvatar[index]}/>
+                                <StatusBar player={player} pos={index} dealer={dealerPos == index} inAction={playerInAction==index} img={!!playersAvatar && playersAvatar[index]}
+                                winnerExist = {players.find(player=> player.status == PlayerStatus.win)} timeBarIn={timeBarIn}/>
                             </Box>
                         )
                     })}
