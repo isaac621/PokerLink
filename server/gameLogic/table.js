@@ -390,6 +390,19 @@ function generateGame(id, roomName, maxNumOfPlayers=8, initialChips=200, minimum
     },
 
     sendReconnectRoomInfo: function(socketID){
+        let playerOptions = null;
+
+        //if the request user is player_in_action, he will get the options
+        if(socketID == this.players[this.playerInAction].socketID){
+            if(this.existingBet == this.players[this.playerInAction].bet){
+                playerOptions = {check: true, raise: true, fold: true, call: false};
+            }
+            else{
+                playerOptions = {check: false, raise: true, fold: true, call: true};
+            }
+        }
+        
+        
        
         return JSON.stringify(
             {
@@ -400,7 +413,13 @@ function generateGame(id, roomName, maxNumOfPlayers=8, initialChips=200, minimum
                         player.holeCards = []
                     }
                     return player
-                })
+                }),
+                minimumRaise: this.minimumRaise,
+                existingBet: this.existingBet,
+                playerInAction: this.playerInAction,
+                playerOptions: playerOptions
+                    
+
             }
         )
     }

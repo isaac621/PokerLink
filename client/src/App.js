@@ -89,7 +89,7 @@ const theme = createTheme({
 
 function App() {
   const {socket, setSocket} = useSocket();
-  const {setRoomID, setPlayers, setRoomName} = useGameContext();
+  const {setRoomID, setPlayers, setRoomName, setMinimumRaise, setPlayerInAction, setExistingBet, setOptions} = useGameContext();
   const [busy, setBusy] = useState(true)
   const navigate = useNavigate()
 
@@ -126,7 +126,14 @@ function App() {
         setRoomID(data.ID);
         setPlayers(data.players);
         setRoomName(data.name)
-      
+
+        setMinimumRaise(data.minimumRaise);
+        setPlayerInAction(data.playerInAction);
+        setExistingBet(data.existingBet);
+        if(data.playerOptions){
+            setOptions(data.playerOptions);
+        }
+        console.log(res)
       }
       
       setBusy(false)
@@ -134,7 +141,7 @@ function App() {
   }, [])
 
 
-
+  
   
   return (
 
@@ -157,6 +164,8 @@ function App() {
             
             <Route exact path='/admin/login' element = {<VisitorRoute><AdminLogin/></VisitorRoute>}/>
             <Route exact path='/admin/edit' element={<AdminRoute><AdminEdit/></AdminRoute>}/>
+
+            <Route path='*' element={<Navigate to='/' replace={true}/>}/>
           </Routes> 
        
         :

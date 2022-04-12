@@ -44,6 +44,9 @@ export const ChatBox = () =>{
 
     useEffect(()=>{
         socket.on('chat', handleChat)
+        console.log(chatLogRef, 'chatLogRef')
+
+        return(()=>socket.off('chat'))
     }, [])
 
     return (

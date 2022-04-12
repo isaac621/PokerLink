@@ -1,11 +1,12 @@
-import { Box, List, ListItem, Divider, ListItemText, ListItemAvatar, ListItemIcon,Avatar, Typography, Button, Fab, CircularProgress} from '@mui/material';
+import { Box, List, ListItem, Divider, ListItemText, ListItemAvatar, ListItemIcon,Avatar, Typography, Button, Fab, CircularProgress, Collapse, Alert, IconButton} from '@mui/material';
 import profilePic from '../../assets/img/profilePic.png'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useGameContext } from "../ContextProvider/GameContextProvider";
 import { useSocket } from "../ContextProvider/SocketContextProvider";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import StarRateIcon from '@mui/icons-material/StarRate';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 export const WaitingRoom = () =>{
@@ -15,8 +16,15 @@ export const WaitingRoom = () =>{
     
     const [busy, setBusy] = useState(false);
 
+    const [alertOpen, setAlertOpen] = useState(false)
+    const [message, setMessage] = useState('')
   
-
+    useEffect(()=>{
+        socket.on('rejectStartGame', (message)=>{
+            setAlertOpen(true)
+            setMessage(message)
+        })
+    })
 
     function handleOnClickStart(){
         socket.emit("gameStart", roomID)
@@ -93,9 +101,32 @@ export const WaitingRoom = () =>{
 
                         {
                         players.find(e=>e.isHost==true).socketID == socket.id &&
-                        <Button sx={Style.startBtn} variant='contained' size="large" onClick={handleOnClickStart}>
-                            Start
-                        </Button>
+                        <>
+                                <Collapse in={alertOpen}>
+                                <Alert
+                                        severity='warning'
+                                        action={
+                                            <IconButton
+                                            aria-label="close"
+                                            color="inherit"
+                                            size="small"
+                                            onClick={() => {
+                                                setAlertOpen(false);
+                                            }}
+                                            >
+                                                <CloseIcon fontSize="inherit" />
+                                            </IconButton>
+                                        }
+                                        sx={{ mt: 1 }}
+                                    >
+                                        {message}
+                                    </Alert>
+                                </Collapse>
+                            <Button sx={Style.startBtn} variant='contained' size="large" onClick={handleOnClickStart}>
+                                Start
+                            </Button>
+                        </>
+
                         }
                 </>
             }

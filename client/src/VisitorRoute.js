@@ -10,7 +10,8 @@ export const VisitorRoute = ({children})=>{
     const [isUser, setIsUser] = useState(false)
     const [isAdmin, setIsAdmin] = useState(false)
 
-    useEffect(async ()=>{
+    useEffect(()=>{
+        (async ()=>{
         if(localStorage.getItem('jwt')){
             const authResult = await authenticate()
             const adminAuthResult = await adminAuthenticate()
@@ -21,8 +22,8 @@ export const VisitorRoute = ({children})=>{
         else{
             setBusy(false)
         }
-        
-    })
+    })()
+}, [])
     
 
     return(

@@ -220,7 +220,7 @@ export default function socketInit(io, games){
             const numOfStagesToShowHand = games[roomID].getNumOfStagesToShowHand()
             for(let i=0; i< numOfStagesToShowHand; i++){
                 
-      
+              console.log(i)
                 await sleep(500)
                 games[roomID].potCalculation();
                 games[roomID].nextStage();
@@ -235,7 +235,8 @@ export default function socketInit(io, games){
                 })))
           
                 io.in(roomID).emit('updateCommunityCards', JSON.stringify(games[roomID].communityCards));
-          
+                
+                console.log(`stage: ${games[roomID].getStage()}`)
                 if(games[roomID].getStage() == 5){
                   io.in(roomID).emit('updateWinner', JSON.stringify(games[roomID].winner));
                   games[roomID].players.map((player, index)=>{
@@ -246,6 +247,7 @@ export default function socketInit(io, games){
                       holeCards: player.holeCards
                     }))
                   })
+                  console.log('directToShowHand')
                   newHand(roomID)
                 }
       
@@ -328,10 +330,12 @@ export default function socketInit(io, games){
             }
           return nextPlayerOptions
         }
+
         function handleGameStart(roomID, err){
           
           if(games[roomID].players.length <2){
             //not enoughPlayer
+            socket.emit('rejectStartGame', 'Not Enough Players');
             return
           }
           //newhand
@@ -376,6 +380,7 @@ export default function socketInit(io, games){
       
           if(playersSurvived.length == 1){
             //games end 
+            console.log('gameEnd')
             io.in(roomID).emit('gameEnd', playersSurvived[0].name)
             
             const update = async()=>{

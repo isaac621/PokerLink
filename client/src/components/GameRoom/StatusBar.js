@@ -1,7 +1,7 @@
 import { Typography, Box, CircularProgress } from '@mui/material';
 import PokerCard from './PokerCard';
 import { PlayerStatus } from '../../assets/utils/enumeration';
-import { amber, red } from '@mui/material/colors';
+import { amber, orange, red } from '@mui/material/colors';
 import dealerBtn from '../../assets/img/dealerBtn.png'
 import { useSpring, animated } from 'react-spring'
 import { useSocket } from '../ContextProvider/SocketContextProvider';
@@ -15,12 +15,14 @@ const ProfilePic = ({inAction, img})=>{
             border: '5px solid rgba(114, 255, 230, 1)'
         },
         loop: {reverse: true},
+        reset: !!inAction
     })
     return(
         <animated.div
         style={inAction ? {
-            ...blinkBorder,
-            ...Style.profileImgContainer
+            
+            ...Style.profileImgContainer,
+            ...blinkBorder
         } : Style.profileImgContainer}
         >   
         {
@@ -36,7 +38,30 @@ const ProfilePic = ({inAction, img})=>{
     )
 }
 
-export const StatusBar = ({player, pos, dealer, inAction, img}) =>{
+const TimeBar = ({inAction})=>{
+    const springConfig = useSpring({
+        from: {
+            width: '100%',
+        },
+        to: {
+            width: '0%',
+        },
+        config: {
+            duration: 23000
+        },
+        reset: !!inAction,
+        loop: false
+    })
+    return(
+        <animated.div
+        style={inAction ? { ...Style.timeBar, ...springConfig}: Style.timeBar}
+        >   
+           
+        </animated.div>
+    )
+}
+
+export const StatusBar = ({player, pos, dealer, inAction, img, winnerExist, timeBarIn}) =>{
     
     const {socket} = useSocket();
     function determineBetDisplayPos(pos){
@@ -107,7 +132,9 @@ export const StatusBar = ({player, pos, dealer, inAction, img}) =>{
                     }
                 </Box>
 
-
+                {
+                    (!winnerExist && timeBarIn) && <TimeBar inAction={inAction}/>
+                }
             </Box>
             {!(player.status == PlayerStatus.fold || player.status == PlayerStatus.idle || player.status == PlayerStatus.out) &&
             <Box sx={Style.holeCardsContainer}>
@@ -123,7 +150,7 @@ export const StatusBar = ({player, pos, dealer, inAction, img}) =>{
                 </Typography>
             </Box>
             }
-
+            
         </Box>
     )
 }
@@ -194,7 +221,8 @@ const Style = {
         transform: 'translateX(-50%)',
         zIndex: 4,
         top: -5,
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        border: '0px'
     },
     profileImg:{
         height: StyleConstant.statusBar.height,
@@ -244,5 +272,13 @@ const Style = {
         alignItems: 'center',
         color: 'rgba(237, 255, 0, 0.8)',
         zIndex: 5
+    },
+    timeBar: {
+        position: 'absolute',
+        zIndex: 3,
+        height: '4px',
+        backgroundColor: orange[500],
+        bottom: 0,
+        width: '0%'
     }
 }

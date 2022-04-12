@@ -1,5 +1,5 @@
 import { Box, Card, Button, Typography, Alert, IconButton, Collapse,  Modal,  CircularProgress} from "@mui/material"
-import {useEffect, useState } from "react"
+import {useEffect, useRef, useState } from "react"
 
 import { serverHost } from "../../constant";
 import CloseIcon from '@mui/icons-material/Close';
@@ -17,6 +17,8 @@ export const UploadAvatar = ({open, setOpen, id}) =>{
     const [alertOpen, setAlertOpen] = useState(false);
     const [avatar, setAvatar] = useState();
     const {updateUser} = useUser();
+
+    const mountedRef = useRef(true)
 
     const handleModalClose = ()=>{
         setOpen(false)
@@ -50,18 +52,22 @@ export const UploadAvatar = ({open, setOpen, id}) =>{
                 'Authorization': `Bearer ${localStorage.getItem('jwt')}`
             },
         }).then(res=>res.blob()).then(res=>URL.createObjectURL(res))
-        setAvatar(avatar)
-
-        setBusy(false)
+        console.log(mountedRef.current)
+        if(mountedRef.current){
+            setAvatar(avatar)
+            setBusy(false)
+        }
     }
 
     useEffect(()=>{
-        
         if(id){
             update()
         }
-        
     }, [open, id])
+
+    useEffect(()=>{
+        return (()=> mountedRef.current = false)
+    }, [])
    
     const handleUpload = async()=>{
         console.log('sent')
@@ -154,7 +160,7 @@ export const UploadAvatar = ({open, setOpen, id}) =>{
                     </label>
                     
                        
-                    <Collapse in={!loading && file}>
+                    <Collapse in={!loading && !!file}>
                         <Button sx={Style.formItem} variant="outlined" onClick={handleUpload} >Update</Button>
                     </Collapse>
                 </Box>
