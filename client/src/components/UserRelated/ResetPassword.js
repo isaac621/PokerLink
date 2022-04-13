@@ -75,8 +75,8 @@ export const ResetPassword = () =>{
             </Collapse>
             <Collapse in={severity != 'success'}>
                 <Box sx={Style.formContainer}>
-                    <TextField sx={Style.formItem} required label="ForgotCode" onChange={(e)=>{setForgotCode(e.target.value)}} type="password"/>
-                    <TextField sx={Style.formItem} required label="New Password" onChange={(e)=>{setNewPassword(e.target.value)}} type="password"/>
+                    <TextField sx={Style.formItem} required label="ForgotCode" onChange={(e)=>{setForgotCode(e.target.value)}} />
+                    <TextField sx={Style.formItem} required label="New Password" onChange={(e)=>{setNewPassword(e.target.value)}} />
                     <Button sx={Style.formItem} variant="outlined" onClick={handleReset} disabled={loading || !forgotCode || !newPassword} color='secondary'>Reset</Button>
                 </Box>
                 
